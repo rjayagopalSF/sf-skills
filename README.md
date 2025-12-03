@@ -33,11 +33,11 @@ sf-ai-{name}              # AI features (agentforce, einstein, copilot)
 |-------|----------|--------|
 | **Phase 1** | Cross-Cutting | `sf-admin`, `sf-security`, `sf-integration`, `sf-testing`, `sf-debugging`, `sf-migration`, `sf-data` |
 | **Phase 2** | AI/Automation | `sf-ai-agentforce`, `sf-ai-copilot`, `sf-ai-einstein` |
-| **Phase 3** | Products | `sf-product-datacloud`, `sf-product-omnistudio`, `sf-product-cpq` |
+| **Phase 3** | Products | `sf-product-datacloud`, `sf-product-omnistudio` |
 | **Phase 4** | Clouds | `sf-cloud-sales`, `sf-cloud-service`, `sf-cloud-experience` |
-| **Phase 5** | Industries | `sf-industry-healthcare`, `sf-industry-finserv` |
+| **Phase 5** | Industries | `sf-industry-healthcare`, `sf-industry-finserv`, `sf-industry-revenue` |
 
-**Total: 23 skills** (4 built, 19 planned)
+**Total: 22 skills** (4 built, 18 planned)
 
 ## Quick Install
 
