@@ -44,7 +44,7 @@ Use **AskUserQuestion** to gather:
 | Test Data Factory | `templates/test-data-factory.cls` |
 | Standard Class | `templates/apex-class.cls` |
 
-Load via: `Read: skills/sf-apex/templates/[template]` (relative to plugin root)
+Load via: `Read: templates/[template]` (relative to plugin root)
 
 ### Phase 3: Code Generation/Review
 
@@ -251,11 +251,16 @@ See [docs/trigger-actions-framework.md](docs/trigger-actions-framework.md) for f
 
 ---
 
+## Dependencies
+
+- **sf-deployment** (optional): Required for deploying Apex code to Salesforce orgs
+  - If not installed, code will be created locally but cannot be deployed via `Skill(skill="sf-deployment")`
+  - Install: `/plugin install github:Jaganpro/sf-skills/sf-deployment`
+
 ## Notes
 
 - **API Version**: 62.0 required
 - **TAF Required**: All triggers must use Trigger Actions Framework
-- **Dependencies**: Requires sf-deployment ≥2.0.0
 - **Scoring**: Block deployment if score < 67
 
 ---

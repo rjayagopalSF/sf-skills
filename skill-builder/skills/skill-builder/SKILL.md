@@ -45,14 +45,14 @@ Use **AskUserQuestion** to collect (in sequence):
    mkdir -p {base_path}
    # Create optional dirs based on selection: examples/, templates/, scripts/, docs/
    ```
-4. **Load template**: `Read: skills/skill-builder/templates/minimal-starter.md` (relative to plugin root)
+4. **Load template**: `Read: templates/minimal-starter.md` (relative to plugin root)
 5. **Replace placeholders**: {{SKILL_NAME}}, {{SKILL_DESCRIPTION}}, {{VERSION}}, {{AUTHOR}}, {{TAGS}}, {{ALLOWED_TOOLS}}
 6. **Write files**: SKILL.md + optional README.md, examples/example-usage.md
 
 ### Phase 3: Deep Validation
 
 ```bash
-python3 skills/skill-builder/scripts/validate_yaml.py {base_path}/SKILL.md
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/validate_yaml.py {base_path}/SKILL.md
 ```
 
 **Validation checks**:
@@ -107,7 +107,7 @@ When validation fails, provide actionable guidance. See [docs/validation-errors.
 When user asks to validate all skills:
 
 ```bash
-python3 skills/skill-builder/scripts/bulk_validate.py [--errors-only] [--format json]
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/bulk_validate.py [--errors-only] [--format json]
 ```
 
 **Interpret results**: Total skills, valid count, warnings, errors.
@@ -120,7 +120,7 @@ See [docs/workflow-examples.md](docs/workflow-examples.md) for output examples.
 For editing existing skills:
 
 ```bash
-python3 skills/skill-builder/scripts/interactive_editor.py /path/to/skill/
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/interactive_editor.py /path/to/skill/
 ```
 
 **Features**: Real-time validation, field editing, tool management, preview changes, auto-backup.
@@ -143,10 +143,10 @@ dependencies:
 
 **Commands**:
 ```bash
-python3 skills/skill-builder/scripts/dependency_manager.py check my-skill      # Check deps
-python3 skills/skill-builder/scripts/dependency_manager.py tree my-skill       # Visualize tree
-python3 skills/skill-builder/scripts/dependency_manager.py circular my-skill   # Detect cycles
-python3 skills/skill-builder/scripts/dependency_manager.py validate --all      # Validate all
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/dependency_manager.py check my-skill      # Check deps
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/dependency_manager.py tree my-skill       # Visualize tree
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/dependency_manager.py circular my-skill   # Detect cycles
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/dependency_manager.py validate --all      # Validate all
 ```
 
 See [docs/workflow-examples.md](docs/workflow-examples.md) for output examples.

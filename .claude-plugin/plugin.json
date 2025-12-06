@@ -1,7 +1,7 @@
 {
   "name": "sf-skills",
-  "version": "1.0.0",
-  "description": "Salesforce development skills for Claude Code - Apex code generation, Flow building, DevOps automation, and skill creation tools",
+  "version": "2.0.0",
+  "description": "Complete Salesforce development suite for Claude Code - Apex, Flow, DevOps, and skill creation tools",
   "author": {
     "name": "Jag Valaiyapathy",
     "url": "https://github.com/Jaganpro"
@@ -19,5 +19,10 @@
     "sfdx",
     "sf-cli"
   ],
-  "hooks": "./hooks/hooks.json"
+  "includes": [
+    "./sf-flow-builder",
+    "./sf-apex",
+    "./sf-deployment",
+    "./skill-builder"
+  ]
 }

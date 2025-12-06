@@ -1,12 +1,9 @@
 #!/usr/bin/env python3
 """
-Post-Write Validation Hook for sf-skills plugin.
+Post-Write Validation Hook for sf-flow-builder plugin.
 
 This hook runs AFTER the Write tool completes and provides validation feedback
-for Salesforce-related files:
-- *.flow-meta.xml: Run Flow validation + simulation
-- *.cls, *.trigger: Run Apex validation (placeholder for future)
-- SKILL.md: Run YAML frontmatter validation
+for Salesforce Flow files (*.flow-meta.xml).
 
 Hook Input (stdin): JSON with tool_input and tool_response
 Hook Output (stdout): JSON with optional output message
@@ -74,100 +71,11 @@ def validate_flow(file_path: str) -> dict:
         }
 
 
-def validate_skill_file(file_path: str) -> dict:
-    """
-    Run YAML frontmatter validation on a SKILL.md file.
-
-    Returns:
-        dict with validation results
-    """
-    try:
-        from pathlib import Path
-        from io import StringIO
-        import sys as _sys
-
-        # Capture stdout from validate_skill_file
-        old_stdout = _sys.stdout
-        _sys.stdout = captured = StringIO()
-
-        try:
-            from validate_skill import validate_skill_file as _validate
-            is_valid = _validate(Path(file_path))
-        finally:
-            _sys.stdout = old_stdout
-
-        output = captured.getvalue()
-
-        # Summarize the output
-        skill_name = os.path.basename(os.path.dirname(file_path))
-        summary = f"\n🔍 SKILL.md Validation: {skill_name}\n"
-
-        if is_valid:
-            summary += "✅ Skill file is valid!\n"
-        else:
-            summary += "❌ Validation failed. Check output above for details.\n"
-
-        return {
-            "continue": True,
-            "output": summary + output
-        }
-
-    except ImportError as e:
-        return {
-            "continue": True,
-            "output": f"⚠️ Skill validator not available: {e}"
-        }
-    except Exception as e:
-        return {
-            "continue": True,
-            "output": f"⚠️ Skill validation error: {e}"
-        }
-
-
-def validate_apex(file_path: str) -> dict:
-    """
-    Run Apex validation on .cls or .trigger files.
-
-    Returns:
-        dict with validation results (placeholder for future implementation)
-    """
-    try:
-        from validate_apex import ApexValidator
-
-        validator = ApexValidator(file_path)
-        results = validator.validate()
-
-        output = f"\n🔍 Apex Validation: {os.path.basename(file_path)}\n"
-        output += f"Score: {results.get('score', 0)}/150\n"
-
-        issues = results.get('issues', [])
-        if issues:
-            output += "Issues found:\n"
-            for issue in issues[:10]:
-                output += f"  • [{issue.get('severity', 'INFO')}] {issue.get('message', '')}\n"
-        else:
-            output += "✅ No issues found!\n"
-
-        return {
-            "continue": True,
-            "output": output
-        }
-
-    except ImportError:
-        # Apex validator not yet implemented - silently skip
-        return {"continue": True}
-    except Exception as e:
-        return {
-            "continue": True,
-            "output": f"⚠️ Apex validation error: {e}"
-        }
-
-
 def main():
     """
     Main hook entry point.
 
-    Reads hook input from stdin, determines file type, runs appropriate validation.
+    Reads hook input from stdin, validates Flow files.
     """
     try:
         # Read hook input from stdin
@@ -184,15 +92,11 @@ def main():
             print(json.dumps({"continue": True}))
             return 0
 
-        # Determine file type and run appropriate validation
+        # Only validate Flow files
         result = {"continue": True}
 
         if file_path.endswith(".flow-meta.xml"):
             result = validate_flow(file_path)
-        elif file_path.endswith("SKILL.md"):
-            result = validate_skill_file(file_path)
-        elif file_path.endswith(".cls") or file_path.endswith(".trigger"):
-            result = validate_apex(file_path)
 
         # Output result
         print(json.dumps(result))

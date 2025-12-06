@@ -6,15 +6,43 @@
     "url": "https://github.com/Jaganpro"
   },
   "metadata": {
-    "version": "1.0.0"
+    "version": "2.0.0"
   },
   "plugins": [
     {
       "name": "sf-skills",
-      "description": "Salesforce development skills - Apex, Flow, DevOps automation",
+      "description": "Complete Salesforce suite - installs all skills (Flow, Apex, Deployment, Skill Builder)",
       "source": "./",
+      "version": "2.0.0",
+      "keywords": ["salesforce", "apex", "flow", "devops", "bundle"]
+    },
+    {
+      "name": "sf-flow-builder",
+      "description": "Salesforce Flow creation and validation with 110-point scoring",
+      "source": "./sf-flow-builder",
+      "version": "2.0.0",
+      "keywords": ["salesforce", "flow", "automation"]
+    },
+    {
+      "name": "sf-apex",
+      "description": "Apex code generation and review with 150-point scoring and TAF patterns",
+      "source": "./sf-apex",
       "version": "1.0.0",
-      "keywords": ["salesforce", "apex", "flow", "devops"]
+      "keywords": ["salesforce", "apex", "trigger"]
+    },
+    {
+      "name": "sf-deployment",
+      "description": "Salesforce DevOps automation using sf CLI v2",
+      "source": "./sf-deployment",
+      "version": "2.0.0",
+      "keywords": ["salesforce", "deployment", "devops"]
+    },
+    {
+      "name": "skill-builder",
+      "description": "Interactive wizard for creating Claude Code skills",
+      "source": "./skill-builder",
+      "version": "2.0.0",
+      "keywords": ["claude-code", "skills", "wizard"]
     }
   ]
 }

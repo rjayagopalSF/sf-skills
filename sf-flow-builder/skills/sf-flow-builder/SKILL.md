@@ -41,7 +41,7 @@ Use **AskUserQuestion** to gather:
 | Autolaunched | `templates/autolaunched-flow-template.xml` |
 | Scheduled | `templates/scheduled-flow-template.xml` |
 
-Load via: `Read: skills/sf-flow-builder/templates/[template].xml` (relative to plugin root)
+Load via: `Read: templates/[template].xml` (relative to plugin root)
 
 **Naming**: API Name = PascalCase_With_Underscores (e.g., `Account_Creation_Screen_Flow`)
 
@@ -76,7 +76,7 @@ Write: force-app/main/default/flows/[FlowName].flow-meta.xml
 **Run Enhanced Validation** (automatic via plugin hooks):
 The plugin automatically validates Flow XML files when written. Manual validation:
 ```bash
-python3 hooks/scripts/validate_flow.py force-app/main/default/flows/[FlowName].flow-meta.xml
+python3 ${CLAUDE_PLUGIN_ROOT}/hooks/scripts/validate_flow.py force-app/main/default/flows/[FlowName].flow-meta.xml
 ```
 
 **Validation (STRICT MODE)**:
@@ -93,7 +93,7 @@ python3 hooks/scripts/validate_flow.py force-app/main/default/flows/[FlowName].f
 
 **Run Simulation** (REQUIRED for record-triggered/scheduled):
 ```bash
-python3 hooks/scripts/simulate_flow.py force-app/main/default/flows/[FlowName].flow-meta.xml --test-records 200
+python3 ${CLAUDE_PLUGIN_ROOT}/hooks/scripts/simulate_flow.py force-app/main/default/flows/[FlowName].flow-meta.xml --test-records 200
 ```
 If simulation fails: **STOP and fix before proceeding**.
 
@@ -134,7 +134,7 @@ Skill(skill="sf-deployment") "Deploy activated flow to [target-org]"
 
 **Generate Documentation**:
 ```bash
-python3 skills/sf-flow-builder/generators/doc_generator.py \
+python3 ${CLAUDE_PLUGIN_ROOT}/generators/doc_generator.py \
   force-app/main/default/flows/[FlowName].flow-meta.xml \
   docs/flows/[FlowName]_documentation.md
 ```
@@ -230,12 +230,17 @@ Required alphabetical order: `apiVersion` → `assignments` → `decisions` → 
 - Validation passes but testing fails → Check Debug Logs, test bulk (200+ records)
 - Sandbox works, production fails → Check FLS differences, verify dependencies
 
+## Dependencies
+
+- **sf-deployment** (optional): Required for deploying flows to Salesforce orgs
+  - If not installed, flows will be created locally but cannot be deployed via `Skill(skill="sf-deployment")`
+  - Install: `/plugin install github:Jaganpro/sf-skills/sf-deployment`
+
 ## Notes
 
 - **Strict Mode**: All warnings block deployment
 - **API 62.0 Required**
 - **Two-Step Deployment**: Validate before deploying
-- **Dependencies**: Requires sf-deployment ≥2.0.0
 - **Python Validators**: Optional but recommended
 
 ---
