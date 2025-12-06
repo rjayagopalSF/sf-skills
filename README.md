@@ -6,6 +6,57 @@
 
 A collection of reusable skills for Salesforce development, specializing in Apex code generation, Flow automation, and DevOps workflows. Built for Claude Code with planned support for other agentic coding tools.
 
+---
+
+## 💡 What is a Skill?
+
+> **Skills are portable knowledge packs that supercharge AI coding agents with domain expertise.**
+
+Think of skills as "installable superpowers" for your agentic coding tool. Instead of repeatedly explaining Salesforce best practices to your AI assistant, a skill pre-loads that knowledge so the AI becomes an instant expert.
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                         🧠 SKILL                                │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│   📋 PROMPT TEMPLATE        Domain-specific instructions &     │
+│                             best practices the AI follows       │
+│                                                                 │
+│   📁 CODE TEMPLATES         Ready-to-use patterns, snippets,   │
+│                             and boilerplate for common tasks    │
+│                                                                 │
+│   ✅ VALIDATION HOOKS       Auto-checks that run when you      │
+│                             write files (scoring, linting)      │
+│                                                                 │
+│   🔗 TOOL INTEGRATIONS      CLI commands, APIs, and external   │
+│                             tools the skill can invoke          │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Why Use Skills?
+
+| Without Skills | With Skills |
+|----------------|-------------|
+| ❌ Explain best practices every conversation | ✅ AI already knows the standards |
+| ❌ Manually review code for anti-patterns | ✅ Auto-validation on every file save |
+| ❌ Copy-paste boilerplate repeatedly | ✅ Production-ready templates built-in |
+| ❌ Remember CLI commands and flags | ✅ Skill handles tool orchestration |
+
+### Anatomy of a Skill
+
+```
+sf-apex/
+├── SKILL.md              # 🧠 The brain - prompts & instructions
+├── templates/            # 📁 Code templates & patterns
+├── hooks/                # ✅ Validation scripts
+└── examples/             # 📖 Usage examples
+```
+
+> 💡 **Tip:** Skills are open-source and composable. You can fork, customize, or create your own!
+
+---
+
 ## 🤖 Supported Agentic Coding Tools
 
 | Tool | Status | |
