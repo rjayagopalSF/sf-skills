@@ -17,33 +17,39 @@ A collection of Claude Code skills for Salesforce development, specializing in A
 
 ## 🚀 Installation
 
-### Install Individual Skills (Recommended)
-
-Install only the skills you need:
-
-```bash
-# Flow development
-/plugin install github:Jaganpro/sf-skills/sf-flow-builder
-
-# Apex development
-/plugin install github:Jaganpro/sf-skills/sf-apex
-
-# Deployment automation
-/plugin install github:Jaganpro/sf-skills/sf-deployment
-
-# Skill creation wizard
-/plugin install github:Jaganpro/sf-skills/skill-builder
-```
-
-### Install All Skills at Once
+### Quick Install (All Skills)
 
 Get the complete Salesforce development suite:
 
 ```bash
-/plugin install github:Jaganpro/sf-skills
+/plugin install Jaganpro/sf-skills
 ```
 
 This installs all 4 skills as a bundle.
+
+### Install Individual Skills
+
+First, add the marketplace to Claude Code:
+
+```bash
+/plugin marketplace add Jaganpro/sf-skills
+```
+
+Then install only the skills you need:
+
+```bash
+# Flow development
+/plugin install sf-flow-builder@sf-skills-marketplace
+
+# Apex development
+/plugin install sf-apex@sf-skills-marketplace
+
+# Deployment automation
+/plugin install sf-deployment@sf-skills-marketplace
+
+# Skill creation wizard
+/plugin install skill-builder@sf-skills-marketplace
+```
 
 ### Local Development Install
 
@@ -51,11 +57,12 @@ This installs all 4 skills as a bundle.
 git clone https://github.com/Jaganpro/sf-skills.git
 cd sf-skills
 
-# Install specific skill
-/plugin install ./sf-flow-builder
-
-# Or install all
+# Install all skills
 /plugin install .
+
+# Or add as local marketplace, then install individually
+/plugin marketplace add .
+/plugin install sf-flow-builder@sf-skills-marketplace
 ```
 
 ## 🔗 Skill Dependencies
