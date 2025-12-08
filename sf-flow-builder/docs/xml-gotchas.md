@@ -39,6 +39,161 @@ Critical XML metadata constraints and known issues when deploying flows via Meta
 
 ---
 
+## Relationship Fields Not Supported in recordLookups (CRITICAL)
+
+**⚠️ DEPLOYMENT BLOCKER**: Flow's Get Records (recordLookups) CANNOT query parent relationship fields.
+
+### What Doesn't Work
+
+```xml
+<!-- ❌ THIS WILL FAIL DEPLOYMENT -->
+<recordLookups>
+    <name>Get_User</name>
+    <object>User</object>
+    <queriedFields>Id</queriedFields>
+    <queriedFields>Name</queriedFields>
+    <queriedFields>Manager.Name</queriedFields>  <!-- FAILS! -->
+</recordLookups>
+```
+
+**Error**: `field integrity exception: unknown (The field "Manager.Name" for the object "User" doesn't exist.)`
+
+### Why It Fails
+
+- Flow's recordLookups only supports direct fields on the queried object
+- Parent relationship traversal (dot notation like `Parent.Field`) is NOT supported
+- This is different from SOQL in Apex which supports relationship queries
+
+### Fields That WON'T Work
+
+| Object | Invalid Field | Error |
+|--------|---------------|-------|
+| User | `Manager.Name` | Manager.Name doesn't exist |
+| Contact | `Account.Name` | Account.Name doesn't exist |
+| Case | `Account.Owner.Email` | Account.Owner.Email doesn't exist |
+| Opportunity | `Account.Industry` | Account.Industry doesn't exist |
+
+### Correct Solution: Two-Step Query
+
+```xml
+<!-- Step 1: Get the child record with lookup ID -->
+<recordLookups>
+    <name>Get_User</name>
+    <object>User</object>
+    <queriedFields>Id</queriedFields>
+    <queriedFields>Name</queriedFields>
+    <queriedFields>ManagerId</queriedFields>  <!-- ✅ Get the ID only -->
+    <outputReference>rec_User</outputReference>
+</recordLookups>
+
+<!-- Step 2: Query parent record using the lookup ID -->
+<recordLookups>
+    <name>Get_Manager</name>
+    <object>User</object>
+    <filters>
+        <field>Id</field>
+        <operator>EqualTo</operator>
+        <value>
+            <elementReference>rec_User.ManagerId</elementReference>
+        </value>
+    </filters>
+    <queriedFields>Id</queriedFields>
+    <queriedFields>Name</queriedFields>
+    <outputReference>rec_Manager</outputReference>
+</recordLookups>
+```
+
+### Flow Routing
+
+Ensure your flow checks for null before using the parent record:
+```xml
+<decisions>
+    <name>Check_Manager_Exists</name>
+    <rules>
+        <conditions>
+            <leftValueReference>rec_Manager</leftValueReference>
+            <operator>IsNull</operator>
+            <rightValue><booleanValue>false</booleanValue></rightValue>
+        </conditions>
+    </rules>
+</decisions>
+```
+
+---
+
+## $Record vs $Record__c Confusion (Record-Triggered Flows)
+
+**⚠️ COMMON MISTAKE**: Confusing Flow's `$Record` with Process Builder's `$Record__c`.
+
+### What's the Difference?
+
+| Variable | Context | Usage |
+|----------|---------|-------|
+| `$Record` | Flow (Record-Triggered) | Single record that triggered the flow |
+| `$Record__c` | Process Builder | Collection of records in trigger batch |
+
+### The Mistake
+
+Trying to create a loop over `$Record__c` in a Flow:
+
+```xml
+<!-- ❌ THIS DOES NOT EXIST IN FLOWS -->
+<loops>
+    <collectionReference>$Record__c</collectionReference>  <!-- INVALID! -->
+</loops>
+```
+
+### Why This Happens
+
+- Process Builder used `$Record__c` to represent the batch of triggering records
+- Developers migrating from Process Builder assume Flows work the same way
+- In Flows, `$Record` is always a **single record**, not a collection
+- The platform handles bulk batching automatically
+
+### Correct Approach in Record-Triggered Flows
+
+**Use `$Record` directly without loops:**
+
+```xml
+<!-- ✅ CORRECT: Direct access to triggered record -->
+<decisions>
+    <conditions>
+        <leftValueReference>$Record.StageName</leftValueReference>
+        <operator>EqualTo</operator>
+        <rightValue><stringValue>Closed Won</stringValue></rightValue>
+    </conditions>
+</decisions>
+
+<!-- ✅ Build task using $Record fields -->
+<assignments>
+    <assignmentItems>
+        <assignToReference>rec_Task.WhatId</assignToReference>
+        <value><elementReference>$Record.Id</elementReference></value>
+    </assignmentItems>
+</assignments>
+```
+
+### When You DO Need Loops
+
+Only when processing **related records**, not the triggered record:
+
+```xml
+<!-- ✅ CORRECT: Loop over RELATED records -->
+<recordLookups>
+    <filters>
+        <field>AccountId</field>
+        <value><elementReference>$Record.AccountId</elementReference></value>
+    </filters>
+    <outputReference>col_RelatedContacts</outputReference>
+</recordLookups>
+
+<loops>
+    <collectionReference>col_RelatedContacts</collectionReference>  <!-- ✅ Valid -->
+</loops>
+```
+
+---
+
 ## recordLookups Conflicts
 
 **NEVER use both** `<storeOutputAutomatically>` AND `<outputReference>` together.
@@ -118,3 +273,26 @@ Salesforce Metadata API requires **strict alphabetical ordering** at root level:
 | "Element X is duplicated" | Elements not alphabetically ordered | Reorder elements |
 | "Element bulkSupport invalid" | Using deprecated element (API 60.0+) | Remove `<bulkSupport>` |
 | "Error parsing file" | Malformed XML | Validate XML syntax |
+| "field 'X.Y' doesn't exist" | Relationship field in queriedFields | Use two-step query pattern |
+| "$Record__Prior can only be used..." | Using $Record__Prior with Create trigger | Change to Update or CreateAndUpdate |
+| "You can't use the Flows action type..." | Subflow in AutoLaunchedFlow | Use inline logic instead |
+
+---
+
+## Summary: Lessons Learned
+
+### Relationship Fields
+- **Problem**: Querying `Parent.Field` in Get Records
+- **Solution**: Two separate queries - child first, then parent by ID
+
+### Record-Triggered Flow Architecture
+- **Problem**: Creating loops over triggered records
+- **Solution**: Use `$Record` directly - platform handles batching
+
+### Deployment
+- **Problem**: Using direct CLI commands
+- **Solution**: Always use sf-deployment skill
+
+### $Record Context
+- **Problem**: Confusing Flow's `$Record` with Process Builder's `$Record__c`
+- **Solution**: `$Record` is single record, use without loops

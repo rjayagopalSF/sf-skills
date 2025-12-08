@@ -12,15 +12,16 @@ This guide consolidates best practices for building maintainable, performant, an
 
 1. [Flow Element Organization](#1-flow-element-organization)
 2. [Using $Record in Record-Triggered Flows](#2-using-record-in-record-triggered-flows)
-3. [Query Optimization](#3-query-optimization)
-4. [When to Use Subflows](#4-when-to-use-subflows)
-5. [Three-Tier Error Handling](#5-three-tier-error-handling)
-6. [Multi-Step DML Rollback Strategy](#6-multi-step-dml-rollback-strategy)
-7. [Transaction Management](#7-transaction-management)
-8. [Screen Flow UX Best Practices](#8-screen-flow-ux-best-practices)
-9. [Bypass Mechanism for Data Loads](#9-bypass-mechanism-for-data-loads)
-10. [Flow Activation Guidelines](#10-flow-activation-guidelines)
-11. [Variable Naming Conventions](#11-variable-naming-conventions)
+3. [Querying Relationship Data](#3-querying-relationship-data) ⚠️ NEW
+4. [Query Optimization](#4-query-optimization)
+5. [When to Use Subflows](#5-when-to-use-subflows)
+6. [Three-Tier Error Handling](#6-three-tier-error-handling)
+7. [Multi-Step DML Rollback Strategy](#7-multi-step-dml-rollback-strategy)
+8. [Transaction Management](#8-transaction-management)
+9. [Screen Flow UX Best Practices](#9-screen-flow-ux-best-practices)
+10. [Bypass Mechanism for Data Loads](#10-bypass-mechanism-for-data-loads)
+11. [Flow Activation Guidelines](#11-flow-activation-guidelines)
+12. [Variable Naming Conventions](#12-variable-naming-conventions)
 
 ---
 
@@ -52,6 +53,27 @@ Structure your flow elements in this sequence for maintainability:
 ## 2. Using $Record in Record-Triggered Flows
 
 When your flow is triggered by a record change, use `$Record` to access field values instead of querying the same object again.
+
+### ⚠️ CRITICAL: $Record vs $Record__c
+
+**Do NOT confuse Flow's `$Record` with Process Builder's `$Record__c`.**
+
+| Variable | Platform | Meaning |
+|----------|----------|---------|
+| `$Record` | **Flow** | Single record that triggered the flow |
+| `$Record__c` | Process Builder (legacy) | Collection of records in trigger batch |
+
+**Common Mistake**: Developers migrating from Process Builder try to loop over `$Record__c` in Flows. This doesn't work because:
+- `$Record__c` does not exist in Flows
+- `$Record` in Flows is a single record, not a collection
+- The platform handles bulk batching automatically - you don't need to loop
+
+**Correct Approach**: Use `$Record` directly without loops:
+```
+Decision: {!$Record.StageName} equals "Closed Won"
+Assignment: Set rec_Task.WhatId = {!$Record.Id}
+Create Records: rec_Task
+```
 
 ### Anti-Pattern (Avoid)
 
@@ -87,7 +109,56 @@ Query the trigger object only when you need:
 
 ---
 
-## 3. Query Optimization
+## 3. Querying Relationship Data
+
+### ⚠️ Get Records Does NOT Support Parent Traversal
+
+**Critical Limitation**: You CANNOT query parent relationship fields in Flow's Get Records.
+
+#### What Doesn't Work
+
+```
+Get Records: User
+Fields: Id, Name, Manager.Name  ← FAILS!
+```
+
+**Error**: "The field 'Manager.Name' for the object 'User' doesn't exist."
+
+#### The Solution: Two-Step Pattern
+
+Query the child object first, then query the parent using the lookup ID:
+
+```
+Step 1: Get Records → User
+        Fields: Id, Name, ManagerId
+        Store in: rec_User
+
+Step 2: Get Records → User
+        Filter: Id equals {!rec_User.ManagerId}
+        Fields: Id, Name
+        Store in: rec_Manager
+
+Step 3: Use {!rec_Manager.Name} in your flow
+```
+
+#### Common Relationship Queries That Need This Pattern
+
+| Child Object | Parent Field | Two-Step Approach |
+|--------------|--------------|-------------------|
+| Contact | Account.Name | Get Contact → Get Account by AccountId |
+| Case | Account.Owner.Email | Get Case → Get Account → Get User |
+| Opportunity | Account.Industry | Get Opportunity → Get Account by AccountId |
+| User | Manager.Name | Get User → Get User by ManagerId |
+
+#### Why This Matters
+
+- Flow's Get Records uses simple field retrieval, not SOQL relationship queries
+- This is different from Apex where you can write `SELECT Account.Name FROM Contact`
+- Always check for null on the parent record before using its fields
+
+---
+
+## 4. Query Optimization
 
 ### Use 'In' and 'Not In' Operators
 
@@ -130,7 +201,7 @@ When `storeOutputAutomatically="true"`, ALL fields are retrieved and stored:
 
 ---
 
-## 4. When to Use Subflows
+## 5. When to Use Subflows
 
 Use subflows for:
 
@@ -168,7 +239,7 @@ Use the `Sub_` prefix:
 
 ---
 
-## 5. Three-Tier Error Handling
+## 6. Three-Tier Error Handling
 
 Implement comprehensive error handling at three levels:
 
@@ -212,7 +283,7 @@ Include context in every error message:
 
 ---
 
-## 6. Multi-Step DML Rollback Strategy
+## 7. Multi-Step DML Rollback Strategy
 
 When a flow performs multiple DML operations, implement rollback paths.
 
@@ -249,7 +320,7 @@ Use `errorMessage` output variable to surface failures:
 
 ---
 
-## 7. Transaction Management
+## 8. Transaction Management
 
 ### Understanding Flow Transactions
 
@@ -284,7 +355,7 @@ TRANSACTION: Creates Account → Creates Contact → Updates related Opportuniti
 
 ---
 
-## 8. Screen Flow UX Best Practices
+## 9. Screen Flow UX Best Practices
 
 ### Progress Indicators
 
@@ -343,7 +414,7 @@ Example: "Complete all required fields (*) before proceeding."
 
 ---
 
-## 9. Bypass Mechanism for Data Loads
+## 10. Bypass Mechanism for Data Loads
 
 When loading large amounts of data, flows can cause performance issues. Implement a bypass mechanism using Custom Metadata.
 
@@ -378,7 +449,7 @@ Add a Decision element as the first step after Start:
 
 ---
 
-## 10. Flow Activation Guidelines
+## 11. Flow Activation Guidelines
 
 ### When to Keep Flows in Draft
 
@@ -404,7 +475,7 @@ Scheduled flows run automatically without user interaction:
 
 ---
 
-## 11. Variable Naming Conventions
+## 12. Variable Naming Conventions
 
 Use consistent prefixes for all variables:
 
@@ -434,16 +505,32 @@ For flow elements (decisions, assignments, etc.):
 
 ## Quick Reference Checklist
 
+### Record-Triggered Flow Essentials
+- [ ] Use `$Record` directly - do NOT create loops over triggered records
+- [ ] Never use `$Record__c` (Process Builder pattern, doesn't exist in Flows)
+- [ ] Platform handles bulk batching - you don't need manual loops
+
+### Get Records Best Practices
 - [ ] Use `$Record` instead of querying trigger object
 - [ ] Add filters to all Get Records elements
 - [ ] Enable `getFirstRecordOnly` when expecting single record
 - [ ] Disable `storeOutputAutomatically` (specify fields explicitly)
+- [ ] **For relationship data**: Use two-step query pattern (child → parent by ID)
+- [ ] Never query `Parent.Field` in queriedFields (not supported)
+
+### Error Handling & DML
 - [ ] Add fault paths to all DML operations
 - [ ] Implement rollback for multi-step DML
+- [ ] Capture `$Flow.FaultMessage` in error handlers
+
+### Naming & Organization
 - [ ] Use variable naming prefixes (`var_`, `col_`, `rec_`, etc.)
 - [ ] Add progress indicators to multi-screen flows
+
+### Testing & Deployment
 - [ ] Test with bulk data (200+ records)
 - [ ] Keep flows in Draft until fully tested
+- [ ] **Always use sf-deployment skill** - never direct CLI commands
 
 ---
 

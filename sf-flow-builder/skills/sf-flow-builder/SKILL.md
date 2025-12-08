@@ -112,6 +112,28 @@ Score: 92/110 ⭐⭐⭐⭐ Very Good
 
 ### Phase 4: Deployment & Integration
 
+⚠️ **MANDATORY: Use sf-deployment Skill** ⚠️
+
+**NEVER use `sf project deploy` or any direct CLI commands via Bash for flow deployment.**
+**ALWAYS invoke the sf-deployment skill.**
+
+This ensures:
+- Two-step validation (dry-run → actual deploy)
+- Proper error handling and reporting
+- Consistent deployment patterns
+- Correct CLI flag usage (--dry-run not --checkonly)
+
+❌ **WRONG** (will be rejected):
+```bash
+sf project deploy start --source-dir force-app/main/default/flows --target-org myOrg
+```
+
+✅ **CORRECT** (required approach):
+```
+Skill(skill="sf-deployment")
+Request: "Deploy flow at force-app/main/default/flows/[FlowName].flow-meta.xml to [target-org] with --dry-run first"
+```
+
 **Step 1: Validation (Check-Only)**
 ```
 Skill(skill="sf-deployment")
@@ -127,9 +149,10 @@ Request: "Proceed with actual deployment of flow to [target-org]."
 ```
 
 **Step 3: Activation**
-```bash
+```
 Edit: <status>Draft</status> → <status>Active</status>
-Skill(skill="sf-deployment") "Deploy activated flow to [target-org]"
+Skill(skill="sf-deployment")
+Request: "Deploy activated flow to [target-org]"
 ```
 
 **Generate Documentation**:
@@ -175,13 +198,81 @@ Resources: ../../examples/, ../../docs/subflow-library.md, ../../docs/orchestrat
 
 ## Best Practices (Built-In Enforcement)
 
+### ⛔ CRITICAL: Record-Triggered Flow Architecture
+
+**NEVER create manual loops over triggered records in Record-Triggered Flows.**
+
+Record-Triggered Flows use **single-record context** with `$Record`. The platform batches records automatically.
+
+| Pattern | Correct? | Explanation |
+|---------|----------|-------------|
+| `$Record.FieldName` | ✅ YES | Direct access to triggering record |
+| Loop over `$Record__c` | ❌ NO | Process Builder pattern, NOT for Flows |
+| Loop over `$Record` collection | ❌ NO | $Record is single record, not collection |
+
+**Correct Pattern for Record-Triggered Flow:**
+```
+Start (Opportunity, After Save)
+  → Decision: Check $Record.StageName
+  → Assignment: Build rec_Task using $Record fields
+  → Create Records: rec_Task
+  → Update Records: rec_AccountUpdate
+```
+
+**When You NEED Loops:** Only for processing RELATED records (not the triggered record):
+```
+Get Records: Query Contacts where AccountId = $Record.Id
+  → Loop: col_RelatedContacts
+  → Assignment: Add to col_ContactsToUpdate
+  → (After loop) Update Records: col_ContactsToUpdate
+```
+
+**Common Mistake**: Trying to loop over triggered records like Process Builder did with `$Record__c`. In Flows, `$Record` is always the single triggering record, and the platform handles bulk processing automatically.
+
+### ⛔ CRITICAL: Relationship Fields in Get Records
+
+**Flow's Get Records (recordLookups) CANNOT query parent relationship fields.**
+
+| Query | Works? | Error |
+|-------|--------|-------|
+| `User.Name` | ✅ YES | Direct field on queried object |
+| `User.ManagerId` | ✅ YES | Direct field (lookup ID) |
+| `User.Manager.Name` | ❌ NO | "field 'Manager.Name' doesn't exist" |
+| `Account.Owner.Email` | ❌ NO | Parent traversal not supported |
+
+**Solution**: Use separate Get Records for parent object:
+```xml
+<!-- Step 1: Get the Case Owner -->
+<recordLookups>
+    <name>Get_Case_Owner</name>
+    <object>User</object>
+    <queriedFields>Id</queriedFields>
+    <queriedFields>Name</queriedFields>
+    <queriedFields>ManagerId</queriedFields>  <!-- Get the ID only -->
+</recordLookups>
+
+<!-- Step 2: Get the Manager (separate query) -->
+<recordLookups>
+    <name>Get_Manager</name>
+    <object>User</object>
+    <filters>
+        <field>Id</field>
+        <operator>EqualTo</operator>
+        <value><elementReference>rec_CaseOwner.ManagerId</elementReference></value>
+    </filters>
+    <queriedFields>Id</queriedFields>
+    <queriedFields>Name</queriedFields>
+</recordLookups>
+```
+
 ### Critical Requirements
 - **API 62.0**: Latest features
 - **No DML in Loops**: Collect in loop → DML after loop (causes bulk failures otherwise)
-- **Bulkify**: MUST handle collections for record-triggered flows
+- **Bulkify**: For RELATED records only - platform handles triggered record batching
 - **Fault Paths**: All DML must have fault connectors
 - **Auto-Layout**: All locationX/Y = 0 (cleaner git diffs)
   - UI may show "Free-Form" dropdown, but locationX/Y = 0 IS Auto-Layout in XML
+- **No Parent Traversal**: Use separate Get Records for relationship field data
 
 ### XML Element Ordering (CRITICAL)
 Required alphabetical order: `apiVersion` → `assignments` → `decisions` → `description` → `label` → `loops` → `processType` → `recordCreates` → `recordUpdates` → `start` → `status` → `variables`
@@ -216,7 +307,17 @@ Required alphabetical order: `apiVersion` → `assignments` → `decisions` → 
 - Valid only for: `Update` or `CreateAndUpdate` triggers
 - Error: "$Record__Prior can only be used...with recordTriggerType of Update or CreateAndUpdate"
 
-**XML Gotchas**: See [../../docs/xml-gotchas.md](../../docs/xml-gotchas.md) for recordLookups conflicts, element ordering, Transform issues, and subflow limitations.
+**Relationship Field in Get Records** (CRITICAL):
+- Error: "The field 'Parent.FieldName' for the object 'X' doesn't exist"
+- Cause: Trying to query parent relationship field (e.g., `Manager.Name`, `Account.Owner.Email`)
+- Fix: Use TWO separate Get Records - first for child, then for parent using the lookup ID
+
+**$Record vs $Record__c Confusion** (CRITICAL):
+- `$Record` = Flow's single-record context (correct for Record-Triggered Flows)
+- `$Record__c` = Process Builder collection pattern (DOES NOT EXIST in Flows)
+- If you try to loop over `$Record__c`, it will fail - use `$Record` directly without loops
+
+**XML Gotchas**: See [../../docs/xml-gotchas.md](../../docs/xml-gotchas.md) for recordLookups conflicts, element ordering, Transform issues, relationship fields, and subflow limitations.
 
 ## Edge Cases
 
