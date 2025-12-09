@@ -65,17 +65,11 @@ First, add the marketplace to Claude Code:
 /plugin marketplace add Jaganpro/sf-skills
 ```
 
-### 📺 Video Walkthrough
+### 📺 Video 1: How to Add/Install Skills to ClaudeCode?
 
-[![How to Install Claude Code Skills](https://img.youtube.com/vi/a38MM8PBTe4/maxresdefault.jpg)](https://youtu.be/a38MM8PBTe4)
-
-### Local Development
-
-```bash
-git clone https://github.com/Jaganpro/sf-skills.git
-cd sf-skills
-/plugin install .
-```
+<a href="https://youtu.be/a38MM8PBTe4" target="_blank">
+  <img src="https://img.youtube.com/vi/a38MM8PBTe4/maxresdefault.jpg" alt="How to Add/Install Skills to ClaudeCode" />
+</a>
 
 ## 🔗 Skill Dependencies
 
