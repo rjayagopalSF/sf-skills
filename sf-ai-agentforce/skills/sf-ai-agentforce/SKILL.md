@@ -11,7 +11,7 @@ Expert Agentforce developer specializing in Agent Script syntax, topic design, a
 
 1. **Agent Creation**: Generate complete Agentforce agents using Agent Script
 2. **Topic Management**: Create and configure agent topics with proper transitions
-3. **Action Integration**: Connect actions to Flows, Apex, or external services
+3. **Action Integration**: Connect actions to Flows (directly) or Apex (via Agent Actions)
 4. **Validation & Scoring**: Score agents against best practices (0-100 points)
 5. **Deployment**: Publish agents using `sf agent publish authoring-bundle`
 
@@ -101,62 +101,128 @@ actions:
 
 ---
 
-## ⚠️ CRITICAL: Action Definitions Location
+## ⚠️ CRITICAL: Reserved Words
 
-**Actions with `target:` MUST be defined INSIDE topics, NOT at the top level.**
+**These words CANNOT be used as input/output parameter names:**
 
+| Reserved Word | Why | Alternative |
+|---------------|-----|-------------|
+| `description` | Conflicts with `description:` keyword | `case_description`, `item_description` |
+| `inputs` | Keyword for action inputs | `input_data`, `request_inputs` |
+| `outputs` | Keyword for action outputs | `output_data`, `response_outputs` |
+| `target` | Keyword for action target | `destination`, `endpoint` |
+| `label` | Keyword for topic label | `display_label`, `title` |
+| `source` | Keyword for linked variables | `data_source`, `origin` |
+
+**Example of Reserved Word Conflict:**
 ```agentscript
-# ❌ WRONG - Top-level actions block causes SyntaxError: "Unexpected 'actions'"
-actions:
-    get_account:
-        description: "Gets account"
-        target: "flow://Get_Account"
+# ❌ WRONG - 'description' conflicts with keyword
+inputs:
+    description: string
+        description: "The description field"
 
-start_agent topic_selector:
-    ...
-
-# ✅ CORRECT - Actions defined inside the topic that uses them
-topic account_lookup:
-    label: "Account Lookup"
-    description: "Looks up account information"
-
-    actions:
-        get_account:
-            description: "Retrieves account information"
-            inputs:
-                account_id: string
-                    description: "Salesforce Account ID"
-            outputs:
-                account_name: string
-                    description: "Account name"
-            target: "flow://Get_Account_Info"
-
-    reasoning:
-        instructions: ->
-            | Help the user look up account information.
-        actions:
-            lookup: @actions.get_account
-                with account_id=...
-                set @variables.account_name = @outputs.account_name
+# ✅ CORRECT - Use alternative name
+inputs:
+    case_description: string
+        description: "The description field"
 ```
-
-**Note**: Each topic can define its own actions. Actions are scoped to the topic they are defined in.
 
 ---
 
-## ⚠️ CRITICAL: Action Target Validation
+## ⚠️ CRITICAL: Action Target Syntax
 
-**The `flow://` and `apex://` targets are validated during publish. The referenced Flow or Apex class MUST exist in the org.**
+### Flow Actions (SUPPORTED - Works Directly)
 
-```bash
-# This will fail if "My_Flow" does not exist in the org:
-# Error: "Invocation Target: bad value for restricted picklist field: My_Flow"
-target: "flow://My_Flow"
+**Flow targets work directly with `flow://FlowAPIName` syntax:**
+
+```agentscript
+actions:
+    get_account:
+        description: "Retrieves account information"
+        inputs:
+            account_id: string
+                description: "Salesforce Account ID"
+        outputs:
+            account_name: string
+                description: "Account name"
+        target: "flow://Get_Account_Info"  # ✅ Works directly!
 ```
 
-**Deployment Order**:
-1. Deploy Flows/Apex classes first using `sf project deploy start`
-2. Then publish the agent using `sf agent publish authoring-bundle`
+**Requirements for Flow Integration:**
+1. Flow must be an **Autolaunched Flow** (not Screen Flow)
+2. Flow variables must be marked "Available for input" / "Available for output"
+3. Variable names in Agent Script must match Flow variable API names exactly
+4. Flow must be deployed to org BEFORE agent publish
+
+### Apex Actions (USE FLOW WRAPPER - RECOMMENDED)
+
+**⚠️ ONLY `flow://` targets work in Agent Script!**
+
+The following target types do **NOT** work:
+```agentscript
+# ❌ DOES NOT WORK - Invalid target format
+target: "apex://CaseService.createCase"
+target: "apex://CaseService"
+target: "action://Create_Support_Case"  # Also invalid!
+```
+
+**RECOMMENDED: Use Flow Wrapper Pattern**
+
+The only reliable way to call Apex from Agent Script is to wrap the Apex in an Autolaunched Flow:
+
+1. **Create Apex class** with `@InvocableMethod` annotation (use sf-apex skill)
+2. **Deploy Apex** to org using `sf project deploy start`
+3. **Create Autolaunched Flow wrapper** that calls the Apex via Action element:
+   ```xml
+   <actionCalls>
+       <actionName>YourApexClassName</actionName>
+       <actionType>apex</actionType>
+       <!-- Map input/output variables -->
+   </actionCalls>
+   ```
+4. **Deploy Flow** to org
+5. **Reference Flow** in Agent Script:
+```agentscript
+# ✅ CORRECT - Use flow:// target pointing to Flow wrapper
+target: "flow://Create_Support_Case"  # Flow that wraps Apex InvocableMethod
+```
+
+**Flow Wrapper Example:**
+
+```xml
+<!-- Create_Support_Case.flow-meta.xml -->
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <actionCalls>
+        <name>Call_Apex_Service</name>
+        <actionName>CaseCreationService</actionName>
+        <actionType>apex</actionType>
+        <inputParameters>
+            <name>subject</name>
+            <value><elementReference>inp_Subject</elementReference></value>
+        </inputParameters>
+        <outputParameters>
+            <assignToReference>var_CaseNumber</assignToReference>
+            <name>caseNumber</name>
+        </outputParameters>
+    </actionCalls>
+    <!-- ... variables with isInput=true/isOutput=true ... -->
+</Flow>
+```
+
+**Alternative: GenAiFunction Metadata (Advanced)**
+
+For advanced users, you can deploy Apex actions via GenAiFunction metadata directly to the org, then associate them with agents through GenAiPlugin (topics). This bypasses Agent Script but requires manual metadata management:
+
+```xml
+<!-- GenAiFunction structure -->
+<GenAiFunction xmlns="http://soap.sforce.com/2006/04/metadata">
+    <invocationTarget>CaseCreationService</invocationTarget>
+    <invocationTargetType>apex</invocationTargetType>
+    <!-- ... -->
+</GenAiFunction>
+```
+
+This approach is NOT recommended for Agent Script-based agents.
 
 ---
 
@@ -232,12 +298,21 @@ Issues:
 
 ### Phase 4: Deployment
 
-**Step 1: Validate (Optional but Recommended)**
+**Step 1: Deploy Dependencies First (if using Flow/Apex actions)**
+```bash
+# Deploy Flows
+sf project deploy start --metadata Flow --test-level NoTestRun --target-org [alias]
+
+# Deploy Apex classes (if any)
+sf project deploy start --metadata ApexClass --test-level NoTestRun --target-org [alias]
+```
+
+**Step 2: Validate (Optional but Recommended)**
 ```bash
 sf agent validate authoring-bundle --api-name [AgentName] --target-org [alias]
 ```
 
-**Step 2: Publish Agent**
+**Step 3: Publish Agent**
 ```bash
 sf agent publish authoring-bundle --api-name [AgentName] --target-org [alias]
 ```
@@ -248,12 +323,12 @@ This command:
 - Retrieves generated metadata back to project
 - Deploys the AiAuthoringBundle to the org
 
-**Step 3: Open in Agentforce Studio (Optional)**
+**Step 4: Open in Agentforce Studio (Optional)**
 ```bash
 sf org open agent --api-name [AgentName] --target-org [alias]
 ```
 
-**Step 4: Activate Agent (Optional)**
+**Step 5: Activate Agent (Optional)**
 ```bash
 sf agent activate --api-name [AgentName] --target-org [alias]
 ```
@@ -508,17 +583,15 @@ system:
 
 ### Action Definitions
 
-**⚠️ IMPORTANT**: Actions must be defined INSIDE a topic, not at the top level. See the "CRITICAL: Action Definitions Location" section above.
+**Actions must be defined INSIDE topics**, not at the top level:
 
 ```agentscript
-# Actions are defined inside the topic that uses them
-topic account_management:
-    label: "Account Management"
-    description: "Manages account lookups and case creation"
+topic account_lookup:
+    label: "Account Lookup"
+    description: "Looks up account information"
 
-    # Define actions available to this topic
+    # ✅ CORRECT - Actions inside topic
     actions:
-        # Flow-based action
         get_account:
             description: "Retrieves account information"
             inputs:
@@ -531,29 +604,14 @@ topic account_management:
                     description: "Account industry"
             target: "flow://Get_Account_Info"
 
-        # Apex-based action
-        create_case:
-            description: "Creates a support case"
-            inputs:
-                subject: string
-                    description: "Case subject"
-                case_desc: string
-                    description: "Case description"
-            outputs:
-                case_id: string
-                    description: "Created case ID"
-            target: "apex://CaseService.createCase"
-
     reasoning:
         instructions: ->
-            | Help the user with account and case management.
+            | Help the user look up account information.
         actions:
             lookup: @actions.get_account
                 with account_id=...
                 set @variables.account_name = @outputs.account_name
 ```
-
-**Note**: The Flow or Apex class referenced in `target:` must exist in the org before publishing the agent.
 
 ### Action Invocation
 
@@ -636,6 +694,8 @@ instructions: ->
         | I don't have your name yet. What should I call you?
 ```
 
+**Boolean Capitalization**: Use `True` and `False` (capital T and F), not `true`/`false`.
+
 ### Operators
 
 | Type | Operators |
@@ -672,10 +732,11 @@ instructions: ->
 - Topic names follow snake_case (-2 each violation)
 
 ### Action Integration (20 points)
-- Valid target format (flow:// or apex://) (-5 each invalid)
+- Valid target format (`flow://` supported, `apex://` NOT supported) (-5 each invalid)
 - All inputs have descriptions (-2 each missing)
 - All outputs captured appropriately (-2 each unused)
 - Action callbacks don't exceed one level (-5 if nested)
+- No reserved words used as input/output names (-3 each violation)
 
 ### Variable Management (15 points)
 - All variables have descriptions (-2 each missing)
@@ -708,23 +769,58 @@ instructions: ->
 
 ## Cross-Skill Integration
 
-See [../../shared/docs/cross-skill-integration.md](../../shared/docs/cross-skill-integration.md)
+### Flow Integration (Fully Supported)
 
-| Direction | Pattern |
-|-----------|---------|
-| sf-agentforce → sf-apex | Create custom Apex actions for agent |
-| sf-agentforce → sf-flow | Create Flow-based actions for agent |
-| sf-agentforce → sf-deploy | Deploy agent metadata |
-| sf-agentforce → sf-metadata | Query object structure for data actions |
+**Workflow:**
+```bash
+# 1. Create Flow using sf-flow skill
+Skill(skill="sf-flow")
+Request: "Create an Autolaunched Flow Get_Account_Info with input account_id and outputs account_name, industry"
 
-**Example**: Creating an agent with a custom Apex action:
-```
-Skill(skill="sf-apex")
-Request: "Create an Apex class CaseService with method createCase that accepts subject and description, returns case ID"
+# 2. Deploy Flow to org
+sf project deploy start --metadata Flow --test-level NoTestRun --target-org [alias]
 
+# 3. Create Agent with flow:// target
 Skill(skill="sf-agentforce")
-Request: "Create an agent that uses apex://CaseService.createCase to handle support requests"
+Request: "Create an agent that uses flow://Get_Account_Info"
+
+# 4. Publish Agent
+sf agent publish authoring-bundle --api-name [AgentName] --target-org [alias]
 ```
+
+### Apex Integration (Use Flow Wrapper)
+
+**⚠️ ONLY `flow://` targets work in Agent Script. Use Flow Wrapper pattern for Apex.**
+
+**Workflow:**
+```bash
+# 1. Create Apex class with @InvocableMethod
+Skill(skill="sf-apex")
+Request: "Create CaseCreationService with @InvocableMethod createCase"
+
+# 2. Deploy Apex to org
+sf project deploy start --metadata ApexClass --test-level NoTestRun --target-org [alias]
+
+# 3. Create Autolaunched Flow wrapper that calls the Apex
+Skill(skill="sf-flow")
+Request: "Create Autolaunched Flow Create_Support_Case that wraps CaseCreationService Apex"
+
+# 4. Deploy Flow to org
+sf project deploy start --metadata Flow --test-level NoTestRun --target-org [alias]
+
+# 5. Reference Flow in Agent Script
+target: "flow://Create_Support_Case"  # Flow wrapper that calls Apex
+
+# 6. Publish Agent
+sf agent publish authoring-bundle --api-name [AgentName] --target-org [alias]
+```
+
+| Direction | Pattern | Supported |
+|-----------|---------|-----------|
+| sf-agentforce → sf-flow | Create Flow-based actions | ✅ Full |
+| sf-agentforce → sf-apex | Create Apex via Flow wrapper | ✅ Via Flow |
+| sf-agentforce → sf-deploy | Deploy agent metadata | ✅ Full |
+| sf-agentforce → sf-metadata | Query object structure | ✅ Full |
 
 ---
 
@@ -796,7 +892,45 @@ topic order_management:
             back: @utils.transition to @topic.topic_selector
 ```
 
-### Pattern 3: Action with Validation
+### Pattern 3: Flow Action with Variable Binding
+```agentscript
+topic account_lookup:
+    label: "Account Lookup"
+    description: "Looks up account information using Flow"
+
+    actions:
+        get_account:
+            description: "Retrieves account information by ID"
+            inputs:
+                inp_AccountId: string
+                    description: "The Salesforce Account ID"
+            outputs:
+                out_AccountName: string
+                    description: "Account name"
+                out_Industry: string
+                    description: "Account industry"
+                out_IsFound: boolean
+                    description: "Whether account was found"
+            target: "flow://Get_Account_Info"
+
+    reasoning:
+        instructions: ->
+            | Ask for the Account ID if not provided.
+            | Use the get_account action to look up the account.
+            |
+            | if @variables.account_found == True:
+            |     | Here is the account: {!@variables.account_name}
+            | else:
+            |     | Account not found. Please check the ID.
+        actions:
+            lookup: @actions.get_account
+                with inp_AccountId=...
+                set @variables.account_name = @outputs.out_AccountName
+                set @variables.account_found = @outputs.out_IsFound
+            back: @utils.transition to @topic.topic_selector
+```
+
+### Pattern 4: Conditional Transitions
 ```agentscript
 topic order_processing:
     label: "Order Processing"
@@ -814,6 +948,8 @@ topic order_processing:
                 with items=@variables.cart_items
                 available when @variables.cart_total > 0
                 available when @variables.needs_approval == False
+            get_approval: @utils.transition to @topic.approval
+                available when @variables.needs_approval == True
 ```
 
 ---
@@ -835,8 +971,12 @@ topic order_processing:
 | Pipe syntax in system: | SyntaxError | Use single quoted string for system instructions |
 | Inline escalate description | SyntaxError | Put `description:` on separate indented line |
 | Invalid default_agent_user | Internal Error | Use valid org user with Agentforce permissions |
-| Top-level actions block | SyntaxError: "Unexpected 'actions'" | Define actions INSIDE topics |
-| Non-existent Flow/Apex target | Publish fails with picklist error | Deploy Flow/Apex before agent |
+| `apex://` target | Not supported | Wrap Apex in Flow, use `flow://` |
+| `action://` target | Not supported | Wrap Apex in Flow, use `flow://` |
+| `description` as input name | Reserved word | Use `case_description` or similar |
+| `true`/`false` booleans | Wrong case | Use `True`/`False` |
+| Actions at top level | Wrong location | Define actions inside topics |
+| Direct Apex call | Only flow:// works | Create Flow wrapper for Apex InvocableMethod |
 
 ---
 
@@ -897,8 +1037,12 @@ python3 ~/.claude/plugins/marketplaces/sf-skills/sf-agentforce/hooks/scripts/val
 | **System Instructions** | Pipe `\|` syntax fails in system: block | Use single quoted string only |
 | **Escalate Description** | Inline description fails | Put `description:` on separate indented line |
 | **Agent User** | Invalid user causes "Internal Error" | Use valid org user with proper permissions |
-| **Action Placement** | Top-level `actions:` block causes SyntaxError | Define actions INSIDE topics, not at top level |
-| **Action Target Validation** | `flow://` and `apex://` targets validated at publish | Deploy Flows/Apex BEFORE publishing agent |
+| **Reserved Words** | `description` as input fails | Use alternative names (e.g., `case_description`) |
+| **Apex Targets** | `apex://` syntax not supported | Wrap Apex in Flow, use `flow://` |
+| **Action Targets** | `action://` syntax not supported | Wrap Apex in Flow, use `flow://` |
+| **Only flow:// Works** | Only `flow://` targets supported | All actions must use Flow targets |
+| **Action Location** | Top-level actions fail | Define actions inside topics |
+| **Flow Targets** | `flow://` works directly | Ensure Flow deployed before agent publish |
 
 ---
 
@@ -913,6 +1057,8 @@ Before deployment, ensure you have:
 - [ ] All linked variables (EndUserId, RoutableId, ContactId)
 - [ ] Language block present
 - [ ] All topics have `label:` and `description:`
+- [ ] No reserved words used as input/output names
+- [ ] Flow/Apex dependencies deployed to org first
 
 ---
 
