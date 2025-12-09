@@ -133,43 +133,6 @@ Each skill includes validation hooks that run automatically when you write files
 
 Hooks provide **advisory feedback** after writes - they inform but don't block.
 
-### Validation Scoring
-
-**Flow Validation (110 points)**:
-- Design & Naming (20 pts)
-- Logic & Structure (20 pts)
-- Architecture (15 pts)
-- Performance & Bulk Safety (20 pts)
-- Error Handling (20 pts)
-- Security (15 pts)
-
-**Apex Validation (150 points)**:
-- Bulkification (25 pts)
-- Security (25 pts)
-- Testing (25 pts)
-- Architecture (20 pts)
-- Clean Code (20 pts)
-- Error Handling (15 pts)
-- Performance (10 pts)
-- Documentation (10 pts)
-
-**Metadata Validation (120 points)**:
-- Structure & Format (20 pts)
-- Naming Conventions (20 pts)
-- Data Integrity (20 pts)
-- Security & FLS (20 pts)
-- Documentation (20 pts)
-- Best Practices (20 pts)
-
-**Data Validation (130 points)**:
-- Query Efficiency (25 pts)
-- Bulk Safety (25 pts)
-- Data Integrity (20 pts)
-- Security & FLS (20 pts)
-- Test Patterns (15 pts)
-- Cleanup & Isolation (15 pts)
-- Documentation (10 pts)
-
 ## 🔧 Prerequisites
 
 - **Claude Code** (latest version)
