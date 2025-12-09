@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Template: External Client App - Global OAuth Settings
+  Use Case: Configure OAuth settings that apply globally to the ECA
+
+  Replace placeholders:
+  - {{CALLBACK_URL}}: OAuth callback URL (must be HTTPS)
+  - {{PKCE_REQUIRED}}: true for public clients (mobile, SPA), false for confidential
+  - {{ROTATE_KEY}}: true to enable consumer key rotation
+  - {{ROTATE_SECRET}}: true to enable consumer secret rotation
+  - {{SECRET_OPTIONAL}}: true for public clients using PKCE only
+
+  Security Recommendations:
+  - PKCE: Required for mobile and SPA applications
+  - Key/Secret Rotation: Enable for production apps (automated via API)
+  - Consumer Secret Optional: Only true when using PKCE exclusively
+
+  File Naming: [AppName].ecaGlobalOauth-meta.xml
+-->
+<ExtlClntAppGlobalOauthSettings xmlns="http://soap.sforce.com/2006/04/metadata">
+    <callbackUrl>{{CALLBACK_URL}}</callbackUrl>
+
+    <!-- Consumer credentials (auto-generated on deploy) -->
+    <!-- <consumerKey>AUTO_GENERATED</consumerKey> -->
+
+    <!-- Security settings -->
+    <isConsumerSecretOptional>{{SECRET_OPTIONAL}}</isConsumerSecretOptional>
+    <isPkceRequired>{{PKCE_REQUIRED}}</isPkceRequired>
+
+    <!-- Credential rotation (recommended for production) -->
+    <shouldRotateConsumerKey>{{ROTATE_KEY}}</shouldRotateConsumerKey>
+    <shouldRotateConsumerSecret>{{ROTATE_SECRET}}</shouldRotateConsumerSecret>
+</ExtlClntAppGlobalOauthSettings>

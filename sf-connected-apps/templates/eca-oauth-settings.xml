@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Template: External Client App - Instance OAuth Settings
+  Use Case: Configure OAuth flows and scopes for the ECA
+
+  Replace placeholders:
+  - {{ADMIN_APPROVED}}: true to require admin approval before use
+  - {{REFRESH_TOKEN_ENABLED}}: true to allow refresh tokens
+  - {{SCOPES}}: OAuth scopes (see scope reference below)
+
+  OAuth Flow Options:
+  - isCodeCredentialsEnabled: Authorization Code flow (web apps)
+  - isClientCredentialsEnabled: Client Credentials flow (server-to-server)
+  - isNamedUserJwtEnabled: Named User JWT flow
+  - isRefreshTokenEnabled: Allow refresh tokens
+
+  Common Scope Combinations:
+  - API Integration: Api, RefreshToken
+  - Web App with Identity: Api, RefreshToken, OpenID, Profile, Email
+  - Server-to-Server: Api only
+
+  File Naming: [AppName].ecaOauth-meta.xml
+-->
+<ExtlClntAppOauthSettings xmlns="http://soap.sforce.com/2006/04/metadata">
+    <!-- Admin approval requirement -->
+    <isAdminApproved>{{ADMIN_APPROVED}}</isAdminApproved>
+
+    <!-- OAuth Flows -->
+    <isCodeCredentialsEnabled>true</isCodeCredentialsEnabled>
+    <isClientCredentialsEnabled>false</isClientCredentialsEnabled>
+    <isNamedUserJwtEnabled>false</isNamedUserJwtEnabled>
+    <isRefreshTokenEnabled>{{REFRESH_TOKEN_ENABLED}}</isRefreshTokenEnabled>
+
+    <!-- Token introspection -->
+    <isIntrospectAllTokens>false</isIntrospectAllTokens>
+
+    <!-- OAuth Scopes -->
+    <scopes>Api</scopes>
+    <scopes>RefreshToken</scopes>
+    <!-- Uncomment additional scopes as needed -->
+    <!-- <scopes>OpenID</scopes> -->
+    <!-- <scopes>Profile</scopes> -->
+    <!-- <scopes>Email</scopes> -->
+    <!-- <scopes>Web</scopes> -->
+    <!-- <scopes>ChatterApi</scopes> -->
+    <!-- <scopes>CustomPermissions</scopes> -->
+</ExtlClntAppOauthSettings>
