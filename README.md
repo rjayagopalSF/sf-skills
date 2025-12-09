@@ -48,15 +48,16 @@ sf-apex/
 
 ## ✨ Available Skills
 
-| Skill | Description | Status |
-|-------|-------------|--------|
-| **[sf-apex](sf-apex/)** | Apex code generation & review with 150-point scoring | ✅ Live |
-| **[sf-flow](sf-flow/)** | Flow creation & validation with 110-point scoring | ✅ Live |
-| **[sf-metadata](sf-metadata/)** | Metadata generation & org querying with 120-point scoring | ✅ Live |
-| **[sf-data](sf-data/)** | Data operations, SOQL expertise & test data factories with 130-point scoring | ✅ Live |
-| **[sf-deploy](sf-deploy/)** | DevOps & CI/CD automation using sf CLI v2 | ✅ Live |
-| **[sf-ai-agentforce](sf-ai-agentforce/)** | Agentforce agent creation with Agent Script & 100-point scoring | ✅ Live |
-| **[skill-builder](skill-builder/)** | Claude Code skill creation wizard | ✅ Live |
+| Skill | Description | Scoring | Status |
+|-------|-------------|---------|--------|
+| **[sf-apex](sf-apex/)** | Apex code generation & review with TAF pattern enforcement | 150 pts | ✅ Live |
+| **[sf-flow](sf-flow/)** | Flow creation & validation with bulkification checks | 110 pts | ✅ Live |
+| **[sf-metadata](sf-metadata/)** | Metadata generation & org querying | 120 pts | ✅ Live |
+| **[sf-data](sf-data/)** | Data operations, SOQL expertise & test data factories | 130 pts | ✅ Live |
+| **[sf-deploy](sf-deploy/)** | DevOps & CI/CD automation using sf CLI v2 | — | ✅ Live |
+| **[sf-ai-agentforce](sf-ai-agentforce/)** | Agentforce agent creation with Agent Script syntax | 100 pts | ✅ Live |
+| **[sf-connected-apps](sf-connected-apps/)** | Connected Apps & External Client Apps with OAuth config | 120 pts | ✅ Live |
+| **[skill-builder](skill-builder/)** | Claude Code skill creation wizard | — | ✅ Live |
 
 ## 🚀 Installation
 
@@ -72,51 +73,241 @@ First, add the marketplace to Claude Code:
   <img src="https://img.youtube.com/vi/a38MM8PBTe4/maxresdefault.jpg" alt="How to Add/Install Skills to ClaudeCode" />
 </a>
 
-## 🔗 Skill Dependencies
+## 🔗 Skill Architecture
 
-Some skills work together for a complete workflow:
+### Complete Skill Ecosystem
 
 ```mermaid
 flowchart TB
-    subgraph consumers [" "]
-        direction LR
-        flow["🔄 sf-flow"]
-        apex["⚡ sf-apex"]
+    subgraph ai["🤖 AI & Agents"]
+        agentforce["🤖 sf-ai-agentforce<br/><small>Agent Script, Topics, Actions</small>"]
     end
 
-    subgraph core [" "]
-        direction LR
-        metadata["📋 sf-metadata"]
-        data["💾 sf-data"]
+    subgraph integration["🔌 Integration"]
+        connectedapps["🔐 sf-connected-apps<br/><small>OAuth, ECAs, Security</small>"]
     end
 
-    deploy["🚀 sf-deploy"]
+    subgraph development["💻 Development"]
+        apex["⚡ sf-apex<br/><small>Triggers, Services, Tests</small>"]
+        flow["🔄 sf-flow<br/><small>Screen, Record, Scheduled</small>"]
+    end
 
-    flow -->|"queries objects/fields"| metadata
-    apex -->|"queries objects/fields"| metadata
-    data -->|"queries object structure"| metadata
+    subgraph foundation["📦 Foundation"]
+        metadata["📋 sf-metadata<br/><small>Objects, Fields, Perms</small>"]
+        data["💾 sf-data<br/><small>SOQL, CRUD, Test Data</small>"]
+    end
 
-    apex -.->|"test data generation"| data
-    flow -.->|"test data generation"| data
+    subgraph devops["🚀 DevOps"]
+        deploy["🚀 sf-deploy<br/><small>CI/CD, Validation</small>"]
+    end
 
-    flow -->|"deploys"| deploy
+    subgraph tooling["🔧 Tooling"]
+        skillbuilder["🛠️ skill-builder<br/><small>Create New Skills</small>"]
+    end
+
+    %% AI relationships
+    agentforce -->|"flow:// targets"| flow
+    agentforce -.->|"Apex via Flow Wrapper"| apex
+
+    %% Integration relationships
+    connectedapps -->|"Named Credentials"| metadata
+    connectedapps -->|"deploys"| deploy
+
+    %% Development relationships
+    apex -->|"queries schema"| metadata
+    flow -->|"queries schema"| metadata
+    apex -.->|"test data"| data
+    flow -.->|"test data"| data
+
+    %% Foundation relationships
+    data -->|"queries structure"| metadata
+
+    %% Deployment relationships
     apex -->|"deploys"| deploy
+    flow -->|"deploys"| deploy
     metadata -->|"deploys"| deploy
+    agentforce -->|"publishes"| deploy
 
-    style flow fill:#6366f1,stroke:#4f46e5,color:#fff
+    %% Styling
+    style agentforce fill:#ec4899,stroke:#db2777,color:#fff
+    style connectedapps fill:#f97316,stroke:#ea580c,color:#fff
     style apex fill:#8b5cf6,stroke:#7c3aed,color:#fff
+    style flow fill:#6366f1,stroke:#4f46e5,color:#fff
     style metadata fill:#06b6d4,stroke:#0891b2,color:#fff
     style data fill:#f59e0b,stroke:#d97706,color:#fff
     style deploy fill:#10b981,stroke:#059669,color:#fff
-    style consumers fill:transparent,stroke:#64748b,stroke-dasharray:5
-    style core fill:transparent,stroke:#64748b,stroke-dasharray:5
+    style skillbuilder fill:#64748b,stroke:#475569,color:#fff
+
+    style ai fill:#fdf2f8,stroke:#ec4899,stroke-width:2px
+    style integration fill:#fff7ed,stroke:#f97316,stroke-width:2px
+    style development fill:#f5f3ff,stroke:#8b5cf6,stroke-width:2px
+    style foundation fill:#ecfeff,stroke:#06b6d4,stroke-width:2px
+    style devops fill:#ecfdf5,stroke:#10b981,stroke-width:2px
+    style tooling fill:#f8fafc,stroke:#64748b,stroke-width:2px
 ```
 
-- **sf-apex** and **sf-flow** can query **sf-metadata** to discover object/field information before generating code
-- **sf-apex** and **sf-flow** can use **sf-data** to generate test data for trigger/flow testing
-- **sf-data** can query **sf-metadata** for object structure before creating test records
-- **sf-apex**, **sf-flow**, and **sf-metadata** use **sf-deploy** for deploying to Salesforce orgs
-- Each skill works standalone, but will prompt you to install dependencies if needed
+### Skill Dependency Flow
+
+```mermaid
+flowchart LR
+    subgraph inputs["📥 Inputs"]
+        requirements["Requirements"]
+        existing["Existing Code"]
+    end
+
+    subgraph skills["🧠 Skills Process"]
+        direction TB
+        gather["1️⃣ Gather Info<br/><small>AskUserQuestion</small>"]
+        query["2️⃣ Query Schema<br/><small>sf-metadata</small>"]
+        generate["3️⃣ Generate<br/><small>Templates + Logic</small>"]
+        validate["4️⃣ Validate<br/><small>Scoring System</small>"]
+        deploy_step["5️⃣ Deploy<br/><small>sf-deploy</small>"]
+    end
+
+    subgraph outputs["📤 Outputs"]
+        code["Apex/Flow/Metadata"]
+        report["Validation Report"]
+        deployed["Deployed to Org"]
+    end
+
+    requirements --> gather
+    existing --> gather
+    gather --> query
+    query --> generate
+    generate --> validate
+    validate --> deploy_step
+
+    generate --> code
+    validate --> report
+    deploy_step --> deployed
+
+    style gather fill:#6366f1,stroke:#4f46e5,color:#fff
+    style query fill:#06b6d4,stroke:#0891b2,color:#fff
+    style generate fill:#8b5cf6,stroke:#7c3aed,color:#fff
+    style validate fill:#f59e0b,stroke:#d97706,color:#fff
+    style deploy_step fill:#10b981,stroke:#059669,color:#fff
+
+    style inputs fill:#f1f5f9,stroke:#64748b
+    style skills fill:#faf5ff,stroke:#8b5cf6
+    style outputs fill:#ecfdf5,stroke:#10b981
+```
+
+### Connected Apps & External Client Apps Flow
+
+```mermaid
+flowchart TB
+    subgraph request["📝 Request"]
+        user["User Request"]
+    end
+
+    subgraph decision["🤔 Decision"]
+        apptype{{"App Type?"}}
+    end
+
+    subgraph connectedapp["🔗 Connected App Path"]
+        ca_template["Select Template<br/><small>basic, oauth, jwt, canvas</small>"]
+        ca_generate["Generate XML<br/><small>.connectedApp-meta.xml</small>"]
+    end
+
+    subgraph eca["🔐 External Client App Path"]
+        eca_header["Generate Header<br/><small>.eca-meta.xml</small>"]
+        eca_oauth["Generate OAuth<br/><small>.ecaGlobalOauth-meta.xml<br/>.ecaOauth-meta.xml</small>"]
+        eca_policy["Generate Policies<br/><small>.ecaPolicy-meta.xml</small>"]
+    end
+
+    subgraph validation["✅ Validation"]
+        score["Score: 120 pts<br/><small>Security, OAuth, Compliance</small>"]
+    end
+
+    subgraph deployment["🚀 Deployment"]
+        deploy_ca["Deploy to Org"]
+        deploy_eca["Deploy to DevHub"]
+    end
+
+    user --> apptype
+    apptype -->|"Simple/Single Org"| ca_template
+    apptype -->|"Multi-Org/ISV/Modern"| eca_header
+
+    ca_template --> ca_generate
+    ca_generate --> score
+
+    eca_header --> eca_oauth
+    eca_oauth --> eca_policy
+    eca_policy --> score
+
+    score -->|"Connected App"| deploy_ca
+    score -->|"External Client App"| deploy_eca
+
+    style apptype fill:#f59e0b,stroke:#d97706,color:#fff
+    style ca_template fill:#6366f1,stroke:#4f46e5,color:#fff
+    style ca_generate fill:#6366f1,stroke:#4f46e5,color:#fff
+    style eca_header fill:#f97316,stroke:#ea580c,color:#fff
+    style eca_oauth fill:#f97316,stroke:#ea580c,color:#fff
+    style eca_policy fill:#f97316,stroke:#ea580c,color:#fff
+    style score fill:#10b981,stroke:#059669,color:#fff
+    style deploy_ca fill:#8b5cf6,stroke:#7c3aed,color:#fff
+    style deploy_eca fill:#8b5cf6,stroke:#7c3aed,color:#fff
+
+    style request fill:#f1f5f9,stroke:#64748b
+    style decision fill:#fef3c7,stroke:#f59e0b
+    style connectedapp fill:#eef2ff,stroke:#6366f1
+    style eca fill:#fff7ed,stroke:#f97316
+    style validation fill:#ecfdf5,stroke:#10b981
+    style deployment fill:#f5f3ff,stroke:#8b5cf6
+```
+
+### Agentforce Integration Architecture
+
+```mermaid
+flowchart TB
+    subgraph agentscript["📝 Agent Script"]
+        agent["Agent Definition<br/><small>.agent file</small>"]
+        topics["Topics<br/><small>Intents & Actions</small>"]
+    end
+
+    subgraph targets["🎯 Action Targets"]
+        flowaction["flow://<br/><small>Autolaunched Flows</small>"]
+        flowwrapper["Flow Wrapper<br/><small>For Apex</small>"]
+    end
+
+    subgraph apex_layer["⚡ Apex Layer"]
+        invocable["@InvocableMethod<br/><small>Apex Class</small>"]
+    end
+
+    subgraph flow_layer["🔄 Flow Layer"]
+        autoflow["Autolaunched Flow<br/><small>actionCalls</small>"]
+    end
+
+    subgraph deployment_layer["🚀 Deployment"]
+        publish["sf agent publish<br/><small>authoring-bundle</small>"]
+    end
+
+    agent --> topics
+    topics -->|"Direct"| flowaction
+    topics -->|"Via Wrapper"| flowwrapper
+
+    flowaction --> autoflow
+    flowwrapper --> autoflow
+    autoflow -->|"actionType=apex"| invocable
+
+    agent --> publish
+    autoflow --> publish
+    invocable --> publish
+
+    style agent fill:#ec4899,stroke:#db2777,color:#fff
+    style topics fill:#ec4899,stroke:#db2777,color:#fff
+    style flowaction fill:#6366f1,stroke:#4f46e5,color:#fff
+    style flowwrapper fill:#6366f1,stroke:#4f46e5,color:#fff
+    style autoflow fill:#6366f1,stroke:#4f46e5,color:#fff
+    style invocable fill:#8b5cf6,stroke:#7c3aed,color:#fff
+    style publish fill:#10b981,stroke:#059669,color:#fff
+
+    style agentscript fill:#fdf2f8,stroke:#ec4899
+    style targets fill:#eef2ff,stroke:#6366f1
+    style apex_layer fill:#f5f3ff,stroke:#8b5cf6
+    style flow_layer fill:#eef2ff,stroke:#6366f1
+    style deployment_layer fill:#ecfdf5,stroke:#10b981
+```
 
 ## 🔌 Plugin Features
 
@@ -126,14 +317,30 @@ Each skill includes validation hooks that run automatically when you write files
 
 | Skill | File Type | Validation |
 |-------|-----------|------------|
-| sf-flow | `*.flow-meta.xml` | Flow best practices, 110-point scoring, bulk safety |
 | sf-apex | `*.cls`, `*.trigger` | Apex anti-patterns, 150-point scoring, TAF compliance |
+| sf-flow | `*.flow-meta.xml` | Flow best practices, 110-point scoring, bulk safety |
 | sf-metadata | `*.object-meta.xml`, `*.field-meta.xml`, etc. | Metadata best practices, 120-point scoring, FLS checks |
 | sf-data | `*.apex`, `*.soql` | SOQL patterns, 130-point scoring, governor limits |
-| sf-ai-agentforce | `*.agentscript` | Agent Script syntax, 100-point scoring, topic validation |
+| sf-ai-agentforce | `*.agent` | Agent Script syntax, 100-point scoring, topic validation |
+| sf-connected-apps | `*.connectedApp-meta.xml`, `*.eca-meta.xml` | OAuth security, 120-point scoring, PKCE validation |
 | skill-builder | `SKILL.md` | YAML frontmatter validation |
 
 Hooks provide **advisory feedback** after writes - they inform but don't block.
+
+### Scoring System Overview
+
+```mermaid
+pie showData
+    title "sf-apex Scoring (150 pts)"
+    "Bulkification" : 25
+    "Security" : 25
+    "Testing" : 25
+    "Architecture" : 20
+    "Clean Code" : 20
+    "Error Handling" : 15
+    "Performance" : 10
+    "Documentation" : 10
+```
 
 ## 🔧 Prerequisites
 
@@ -176,6 +383,21 @@ Hooks provide **advisory feedback** after writes - they inform but don't block.
 "Clean up all test records created today"
 ```
 
+### Connected Apps & OAuth
+```
+"Create a Connected App for API integration with JWT Bearer flow"
+"Generate an External Client App for our mobile application with PKCE"
+"Review my Connected Apps for security best practices"
+"Migrate MyConnectedApp to an External Client App"
+```
+
+### Agentforce Agents
+```
+"Create an Agentforce agent for customer support triage"
+"Build a FAQ agent with topic-based routing"
+"Generate an agent that calls my Apex service via Flow wrapper"
+```
+
 ### Deployment
 ```
 "Deploy my Apex classes to sandbox with tests"
@@ -201,6 +423,7 @@ sf-industry-{name}        # Industries (healthcare, finserv)
 ### 🔧 Cross-Cutting Skills
 | Skill | Description | Status |
 |-------|-------------|--------|
+| `sf-connected-apps` | Connected Apps, ECAs, OAuth configuration | ✅ Live |
 | `sf-security` | Sharing rules, org-wide defaults, encryption | 📋 Planned |
 | `sf-integration` | REST, SOAP, Platform Events | 📋 Planned |
 | `sf-testing` | Test strategy, mocking, coverage | 📋 Planned |
@@ -234,7 +457,7 @@ sf-industry-{name}        # Industries (healthcare, finserv)
 | `sf-industry-finserv` | KYC, AML, Wealth Management | 📋 Planned |
 | `sf-industry-revenue` | CPQ, Billing, Revenue Lifecycle | 📋 Planned |
 
-**Total: 22 skills** (7 live ✅, 15 planned 📋)
+**Total: 23 skills** (8 live ✅, 15 planned 📋)
 
 ## Contributing
 
