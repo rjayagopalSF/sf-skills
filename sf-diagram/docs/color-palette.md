@@ -1,202 +1,244 @@
 # sf-diagram Color Palette
 
-Accessibility-focused color palette inspired by CloudSundial and Jon Jordan's color-blind friendly design principles.
+Modern, accessibility-focused color palette matching the sf-skills README style.
 
-## Primary Palette
+## Primary Palette (Tailwind-inspired)
 
 ```
-┌─────────────────────────────────────────────────────────────────────────┐
-│  COMPONENT                │  COLOR NAME    │  HEX       │  RGB          │
-├───────────────────────────┼────────────────┼────────────┼───────────────┤
-│  User/Browser             │  Salesforce    │  #00A1E0   │  0, 161, 224  │
-│  Client Application       │  Navy Blue     │  #032D60   │  3, 45, 96    │
-│  Salesforce (Auth Server) │  Orange        │  #FF6D00   │  255, 109, 0  │
-│  Resource Server/API      │  Green         │  #04844B   │  4, 132, 75   │
-│  External IdP             │  Purple        │  #9050E9   │  144, 80, 233 │
-│  Middleware/Integration   │  Teal          │  #06A59A   │  6, 165, 154  │
-│  Database/Storage         │  Indigo        │  #5867E8   │  88, 103, 232 │
-└───────────────────────────┴────────────────┴────────────┴───────────────┘
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  COMPONENT                │  COLOR NAME    │  FILL HEX  │  STROKE HEX      │
+├───────────────────────────┼────────────────┼────────────┼──────────────────┤
+│  AI & Agents              │  Pink          │  #ec4899   │  #db2777         │
+│  Integration/Security     │  Orange        │  #f97316   │  #ea580c         │
+│  Integration (Alt)        │  Teal          │  #14b8a6   │  #0d9488         │
+│  Diagrams/Documentation   │  Sky Blue      │  #0ea5e9   │  #0284c7         │
+│  Apex/Development         │  Purple        │  #8b5cf6   │  #7c3aed         │
+│  Flow/Automation          │  Indigo        │  #6366f1   │  #4f46e5         │
+│  Metadata/Foundation      │  Cyan          │  #06b6d4   │  #0891b2         │
+│  Data/Storage             │  Amber         │  #f59e0b   │  #d97706         │
+│  Deploy/DevOps            │  Emerald       │  #10b981   │  #059669         │
+│  Tooling/Utility          │  Slate         │  #64748b   │  #475569         │
+└───────────────────────────┴────────────────┴────────────┴──────────────────┘
+```
+
+## Salesforce-Specific Colors
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  SALESFORCE COMPONENT     │  FILL HEX      │  STROKE HEX │  TEXT COLOR     │
+├───────────────────────────┼────────────────┼─────────────┼─────────────────┤
+│  Salesforce Brand         │  #00A1E0       │  #032D60    │  #ffffff        │
+│  Connected Apps/OAuth     │  #f97316       │  #ea580c    │  #ffffff        │
+│  External Systems         │  #04844B       │  #032D60    │  #ffffff        │
+│  Users/Actors             │  #9050E9       │  #7c3aed    │  #ffffff        │
+│  Platform Events          │  #14b8a6       │  #0d9488    │  #ffffff        │
+│  Named Credentials        │  #f97316       │  #ea580c    │  #ffffff        │
+└───────────────────────────┴────────────────┴─────────────┴─────────────────┘
 ```
 
 ## Status Colors
 
 ```
-┌─────────────────────────────────────────────────────────────────────────┐
-│  STATUS                   │  COLOR NAME    │  HEX       │  USAGE        │
-├───────────────────────────┼────────────────┼────────────┼───────────────┤
-│  Success                  │  Green         │  #2E844A   │  ✅ Completed │
-│  Error/Failure            │  Red           │  #EA001E   │  ❌ Failed    │
-│  Warning                  │  Yellow        │  #FE9339   │  ⚠️ Warning   │
-│  Info/Neutral             │  Gray          │  #706E6B   │  ℹ️ Info      │
-│  Pending/Processing       │  Blue          │  #0176D3   │  ⏳ In Progress│
-└───────────────────────────┴────────────────┴────────────┴───────────────┘
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  STATUS                   │  FILL HEX      │  STROKE HEX │  ICON           │
+├───────────────────────────┼────────────────┼─────────────┼─────────────────┤
+│  Success                  │  #10b981       │  #059669    │  ✅             │
+│  Error/Failure            │  #ef4444       │  #dc2626    │  ❌             │
+│  Warning                  │  #f59e0b       │  #d97706    │  ⚠️             │
+│  Info/Neutral             │  #64748b       │  #475569    │  ℹ️             │
+│  In Progress              │  #3b82f6       │  #2563eb    │  ⏳             │
+└───────────────────────────┴────────────────┴─────────────┴─────────────────┘
 ```
 
-## Mermaid Theme Configuration
+---
 
-### Sequence Diagrams
-```javascript
-%%{init: {'theme': 'base', 'themeVariables': {
-  'actorBkg': '#00A1E0',
-  'actorTextColor': '#ffffff',
-  'actorBorder': '#032D60',
-  'signalColor': '#032D60',
-  'signalTextColor': '#032D60',
-  'labelBoxBkgColor': '#FF6D00',
-  'labelBoxBorderColor': '#032D60',
-  'labelTextColor': '#ffffff',
-  'loopTextColor': '#032D60',
-  'noteBkgColor': '#f0f0f0',
-  'noteBorderColor': '#706E6B',
-  'noteTextColor': '#032D60',
-  'activationBkgColor': '#E1F5FE',
-  'activationBorderColor': '#00A1E0',
-  'sequenceNumberColor': '#ffffff'
-}}}%%
-```
+## Mermaid Styling Approach
 
-### ER Diagrams
-```javascript
-%%{init: {'theme': 'base', 'themeVariables': {
-  'primaryColor': '#00A1E0',
-  'primaryTextColor': '#032D60',
-  'primaryBorderColor': '#032D60',
-  'lineColor': '#706E6B',
-  'secondaryColor': '#f0f0f0',
-  'tertiaryColor': '#E1F5FE'
-}}}%%
-```
+### Preferred: Individual Node Styling
 
-### Flowcharts
-```javascript
-%%{init: {'theme': 'base', 'themeVariables': {
-  'primaryColor': '#00A1E0',
-  'primaryTextColor': '#ffffff',
-  'primaryBorderColor': '#032D60',
-  'lineColor': '#706E6B',
-  'secondaryColor': '#FF6D00',
-  'tertiaryColor': '#04844B',
-  'background': '#ffffff',
-  'mainBkg': '#00A1E0',
-  'nodeBorder': '#032D60'
-}}}%%
-```
-
-## Actor Box Colors (Sequence Diagrams)
-
-Use `box rgb(R,G,B)` to group related actors:
+Instead of using `%%{init}` blocks, use individual `style` declarations for better control and consistency:
 
 ```mermaid
-sequenceDiagram
-    box rgb(230,247,255) User/Client
-        participant U as User
-        participant B as Browser
-    end
+flowchart TB
+    A["🤖 sf-ai-agentforce<br/><small>Agent Script, Topics, Actions</small>"]
+    B["⚡ sf-apex<br/><small>Triggers, Services, Tests</small>"]
+    C["🔗 sf-integration<br/><small>Named Creds, REST/SOAP</small>"]
 
-    box rgb(240,240,255) Application
-        participant A as App Server
-    end
+    A --> B
+    A --> C
 
-    box rgb(255,240,230) Salesforce
-        participant SF as Salesforce
-    end
-
-    box rgb(240,255,240) External
-        participant EXT as External API
-    end
+    %% Individual node styling
+    style A fill:#ec4899,stroke:#db2777,color:#fff
+    style B fill:#8b5cf6,stroke:#7c3aed,color:#fff
+    style C fill:#14b8a6,stroke:#0d9488,color:#fff
 ```
 
-### Box Color Reference
+### Subgraph Styling
 
-| Category | RGB | Hex | Description |
-|----------|-----|-----|-------------|
-| User/Client | `rgb(230,247,255)` | `#E6F7FF` | Light blue tint |
-| Application | `rgb(240,240,255)` | `#F0F0FF` | Light lavender |
-| Salesforce | `rgb(255,240,230)` | `#FFF0E6` | Light orange tint |
-| External | `rgb(240,255,240)` | `#F0FFF0` | Light green tint |
-| Middleware | `rgb(240,255,255)` | `#F0FFFF` | Light cyan |
-| Database | `rgb(245,240,255)` | `#F5F0FF` | Light purple |
+Use transparent backgrounds with dashed borders:
+
+```mermaid
+flowchart TB
+    subgraph ai["🤖 AI & Agents"]
+        A[Agent]
+    end
+
+    subgraph dev["💻 Development"]
+        B[Apex]
+        C[Flow]
+    end
+
+    %% Subgraph styling - transparent with dashed border
+    style ai fill:transparent,stroke:#ec4899,stroke-dasharray:5
+    style dev fill:transparent,stroke:#8b5cf6,stroke-dasharray:5
+```
+
+---
+
+## Node Label Patterns
+
+### With Subtitle (Recommended)
+
+```
+["🔐 sf-connected-apps<br/><small>OAuth, ECAs, Security</small>"]
+```
+
+Renders as:
+- Main title with icon
+- Smaller subtitle with details
+
+### Simple Label
+
+```
+[🤖 Service Agent]
+```
+
+### Database/Cylinder
+
+```
+[(💾 Database)]
+```
+
+---
+
+## Complete Style Template
+
+Copy this template for consistent diagrams:
+
+```mermaid
+flowchart TB
+    subgraph ai["🤖 AI & Agents"]
+        agentforce["🤖 sf-ai-agentforce<br/><small>Agent Script, Topics<br/>GenAiFunction, PromptTemplate</small>"]
+    end
+
+    subgraph integration["🔌 Integration & Security"]
+        connectedapps["🔐 sf-connected-apps<br/><small>OAuth, ECAs, Security</small>"]
+        sfintegration["🔗 sf-integration<br/><small>Named Creds, REST/SOAP<br/>Platform Events, CDC</small>"]
+    end
+
+    subgraph development["💻 Development"]
+        apex["⚡ sf-apex<br/><small>Triggers, Services, Tests</small>"]
+        flow["🔄 sf-flow<br/><small>Screen, Record, Scheduled</small>"]
+    end
+
+    subgraph foundation["📦 Foundation"]
+        metadata["📋 sf-metadata<br/><small>Objects, Fields, Perms</small>"]
+        data["💾 sf-data<br/><small>SOQL, CRUD, Test Data</small>"]
+    end
+
+    subgraph devops["🚀 DevOps"]
+        deploy["🚀 sf-deploy<br/><small>CI/CD, Validation</small>"]
+    end
+
+    %% Relationships
+    agentforce -->|"flow:// actions"| flow
+    agentforce -->|"API actions"| sfintegration
+    sfintegration -->|"OAuth apps"| connectedapps
+    apex -->|"queries schema"| metadata
+    flow -->|"queries schema"| metadata
+    apex -->|"deploys"| deploy
+
+    %% Node Styling - AI (pink)
+    style agentforce fill:#ec4899,stroke:#db2777,color:#fff
+
+    %% Node Styling - Integration (orange/teal)
+    style connectedapps fill:#f97316,stroke:#ea580c,color:#fff
+    style sfintegration fill:#14b8a6,stroke:#0d9488,color:#fff
+
+    %% Node Styling - Development (purple/indigo)
+    style apex fill:#8b5cf6,stroke:#7c3aed,color:#fff
+    style flow fill:#6366f1,stroke:#4f46e5,color:#fff
+
+    %% Node Styling - Foundation (cyan/amber)
+    style metadata fill:#06b6d4,stroke:#0891b2,color:#fff
+    style data fill:#f59e0b,stroke:#d97706,color:#fff
+
+    %% Node Styling - DevOps (green)
+    style deploy fill:#10b981,stroke:#059669,color:#fff
+
+    %% Subgraph Styling - transparent with dashed borders
+    style ai fill:transparent,stroke:#ec4899,stroke-dasharray:5
+    style integration fill:transparent,stroke:#f97316,stroke-dasharray:5
+    style development fill:transparent,stroke:#8b5cf6,stroke-dasharray:5
+    style foundation fill:transparent,stroke:#06b6d4,stroke-dasharray:5
+    style devops fill:transparent,stroke:#10b981,stroke-dasharray:5
+```
+
+---
+
+## Icon Reference
+
+| Category | Icon | Unicode | Usage |
+|----------|------|---------|-------|
+| AI/Agents | 🤖 | U+1F916 | Agentforce, AI features |
+| Apex | ⚡ | U+26A1 | Code, triggers, services |
+| Flow | 🔄 | U+1F504 | Automation, flows |
+| Metadata | 📋 | U+1F4CB | Objects, fields |
+| Data | 💾 | U+1F4BE | SOQL, records |
+| Deploy | 🚀 | U+1F680 | CI/CD, deployment |
+| Connected Apps | 🔐 | U+1F510 | OAuth, security |
+| Integration | 🔗 | U+1F517 | Named Creds, callouts |
+| Diagram | 📊 | U+1F4CA | Documentation |
+| Tooling | 🛠️ | U+1F6E0 | Utilities |
+| User | 👤 | U+1F464 | End users |
+| Browser | 🌐 | U+1F310 | Web apps |
+| Cloud | ☁️ | U+2601 | Salesforce platform |
+| External | 🏭 | U+1F3ED | External systems |
+| Database | 💾 | U+1F4BE | Data storage |
+
+---
 
 ## Color Blind Accessibility
 
-This palette is designed to be distinguishable for common forms of color blindness:
+This palette maintains distinguishability for common color blindness:
 
-| Condition | Affected Colors | Our Approach |
-|-----------|-----------------|--------------|
-| Protanopia (red-blind) | Red/Green confusion | Use blue/orange as primary contrast |
-| Deuteranopia (green-blind) | Red/Green confusion | Orange (#FF6D00) vs Blue (#00A1E0) |
-| Tritanopia (blue-blind) | Blue/Yellow confusion | Use shape + color combinations |
+| Condition | Our Approach |
+|-----------|--------------|
+| Protanopia | Pink vs Teal have different luminance |
+| Deuteranopia | Orange vs Cyan are well separated |
+| Tritanopia | Icons + text supplement colors |
 
 ### Key Principles
 
-1. **High Contrast** - Text on colored backgrounds has minimum 4.5:1 contrast ratio
-2. **Shape + Color** - Icons/emojis supplement color coding (👤 🌐 🖥️ ☁️)
-3. **Distinct Hues** - Primary colors are well separated on the color wheel
-4. **Pattern Fallback** - ASCII diagrams don't rely on color at all
+1. **Icons supplement colors** - Every node has an icon
+2. **High contrast text** - White text on colored backgrounds
+3. **Stroke differentiation** - Darker strokes add definition
+4. **Dashed subgraphs** - Pattern, not just color
 
-## Icon Usage
+---
 
-Supplement colors with icons for clarity:
+## Dark Mode Support
 
-| Actor Type | Icon | Unicode |
-|------------|------|---------|
-| User | 👤 | U+1F464 |
-| Browser | 🌐 | U+1F310 |
-| Mobile App | 📱 | U+1F4F1 |
-| Server | 🖥️ | U+1F5A5 |
-| Cloud/Salesforce | ☁️ | U+2601 |
-| Database | 💾 | U+1F4BE |
-| API/Service | ⚙️ | U+2699 |
-| Security/Auth | 🔐 | U+1F510 |
-| External System | 🏭 | U+1F3ED |
-| Middleware | 🔄 | U+1F504 |
-| Event/Message | 📢 | U+1F4E2 |
-| Success | ✅ | U+2705 |
-| Error | ❌ | U+274C |
-| Warning | ⚠️ | U+26A0 |
+The style works on both light and dark backgrounds because:
+- Nodes have solid fill colors
+- White text provides contrast
+- Strokes add definition
+- Transparent subgraphs adapt to background
 
-## Usage Examples
-
-### OAuth Flow (Sequence)
-```mermaid
-sequenceDiagram
-    participant U as 👤 User
-    participant B as 🌐 Browser
-    participant SF as ☁️ Salesforce
-
-    U->>B: Click Login
-    B->>SF: Redirect to /authorize
-```
-
-### Data Model (ERD)
-```mermaid
-erDiagram
-    ACCOUNT ||--o{ CONTACT : "has"
-    ACCOUNT {
-        Id Id PK
-        Text Name
-    }
-```
-
-### Integration (Flowchart)
-```mermaid
-flowchart LR
-    A[🏭 ERP] --> B[🔄 MuleSoft]
-    B --> C[☁️ Salesforce]
-```
-
-## Dark Mode Considerations
-
-For dark backgrounds, invert the palette:
-
-| Light Mode | Dark Mode |
-|------------|-----------|
-| `#032D60` (text) | `#E1F5FE` (text) |
-| `#ffffff` (bg) | `#1a1a2e` (bg) |
-| `#f0f0f0` (note bg) | `#2a2a3e` (note bg) |
+---
 
 ## References
 
-- [Salesforce Lightning Design System - Color](https://www.lightningdesignsystem.com/design-tokens/#category-color)
-- [CloudSundial Accessibility Approach](https://cloudsundial.com/diagrams-of-identity-flows-in-context)
-- [Jon Jordan's Color-Blind Friendly Design](https://www.salesforce.com/blog/how-salesforce-maps-color-blind-friendly/)
+- [Tailwind CSS Color Palette](https://tailwindcss.com/docs/colors)
+- [Salesforce Lightning Design System](https://www.lightningdesignsystem.com/)
+- [CloudSundial Diagrams](https://cloudsundial.com/diagrams-of-identity-flows-in-context)

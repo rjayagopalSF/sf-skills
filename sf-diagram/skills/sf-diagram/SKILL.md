@@ -130,31 +130,59 @@ Score: XX/80 ⭐⭐⭐⭐ Rating
 
 ---
 
-## Color Palette (CloudSundial-Inspired)
+## Mermaid Styling Guide (sf-skills Standard)
 
-Accessibility-focused colors based on Jon Jordan's color-blind friendly approach:
+Use individual `style` declarations with Tailwind-inspired colors for consistent diagrams across the sf-skills ecosystem.
 
-| Actor/Component | Color | Hex | Usage |
-|-----------------|-------|-----|-------|
-| User/Browser | Teal | `#00A1E0` | End users, browser clients |
-| Client Application | Navy Blue | `#032D60` | Web servers, mobile apps |
-| Salesforce Auth Server | Orange | `#FF6D00` | Authentication endpoints |
-| Resource Server | Green | `#04844B` | API endpoints, data services |
-| External IdP | Purple | `#9050E9` | Third-party identity providers |
-| Success/Tokens | Green | `#2E844A` | Successful responses, tokens |
-| Error/Warning | Red | `#EA001E` | Errors, failures |
-| Async/Background | Gray | `#706E6B` | Background processes |
+### Primary Color Palette
 
-**Mermaid Theme Configuration**:
+| Component | Fill Hex | Stroke Hex | Usage |
+|-----------|----------|------------|-------|
+| AI & Agents | `#ec4899` | `#db2777` | Agentforce, AI features |
+| Integration (Orange) | `#f97316` | `#ea580c` | Connected Apps, OAuth |
+| Integration (Teal) | `#14b8a6` | `#0d9488` | Named Creds, callouts |
+| Development (Purple) | `#8b5cf6` | `#7c3aed` | Apex, services |
+| Development (Indigo) | `#6366f1` | `#4f46e5` | Flows, automation |
+| Foundation (Cyan) | `#06b6d4` | `#0891b2` | Metadata, objects |
+| Foundation (Amber) | `#f59e0b` | `#d97706` | Data, storage |
+| DevOps (Green) | `#10b981` | `#059669` | Deploy, CI/CD |
+| Utility (Slate) | `#64748b` | `#475569` | Tooling |
+
+### Preferred: Individual Node Styling
+
+**DO use `style` declarations (preferred)**:
+```mermaid
+flowchart TB
+    A["🤖 Agent<br/><small>Topics, Actions</small>"]
+    B["⚡ Apex<br/><small>Services, Tests</small>"]
+
+    A --> B
+
+    style A fill:#ec4899,stroke:#db2777,color:#fff
+    style B fill:#8b5cf6,stroke:#7c3aed,color:#fff
 ```
-%%{init: {'theme': 'base', 'themeVariables': {
-  'primaryColor': '#00A1E0',
-  'secondaryColor': '#032D60',
-  'tertiaryColor': '#FF6D00',
-  'primaryTextColor': '#032D60',
-  'lineColor': '#706E6B'
-}}}%%
+
+**AVOID `%%{init}` blocks** - they're harder to maintain and less flexible.
+
+### Subgraph Styling
+
+Use transparent backgrounds with dashed borders:
+```mermaid
+subgraph ai["🤖 AI & Agents"]
+    A[Agent]
+end
+
+style ai fill:transparent,stroke:#ec4899,stroke-dasharray:5
 ```
+
+### Node Label Pattern
+
+Include icons and subtitles for rich labels:
+```
+["🔐 sf-connected-apps<br/><small>OAuth, ECAs, Security</small>"]
+```
+
+**Full reference**: See `docs/color-palette.md`
 
 ---
 

@@ -1,6 +1,6 @@
 # System Landscape Diagram Template
 
-Flowchart template for visualizing high-level Salesforce system architecture.
+Flowchart template for visualizing high-level Salesforce system architecture using the sf-skills standard styling.
 
 ## When to Use
 - Architecture overview presentations
@@ -11,74 +11,66 @@ Flowchart template for visualizing high-level Salesforce system architecture.
 ## Mermaid Template - Sales Cloud Integration Landscape
 
 ```mermaid
-%%{init: {'theme': 'base', 'themeVariables': {
-  'primaryColor': '#00A1E0',
-  'primaryTextColor': '#ffffff',
-  'primaryBorderColor': '#032D60',
-  'lineColor': '#706E6B',
-  'secondaryColor': '#FF6D00',
-  'tertiaryColor': '#04844B'
-}}}%%
 flowchart TB
-    subgraph users[👥 Users]
+    subgraph users["👥 Users"]
         direction LR
-        U1[Sales Reps<br/>📱 Mobile]
-        U2[Managers<br/>💻 Desktop]
-        U3[Partners<br/>🌐 Portal]
+        U1["📱 Sales Reps<br/><small>Mobile App</small>"]
+        U2["💻 Managers<br/><small>Desktop</small>"]
+        U3["🌐 Partners<br/><small>Portal</small>"]
     end
 
-    subgraph salesforce[☁️ Salesforce Platform]
+    subgraph salesforce["☁️ Salesforce Platform"]
         direction TB
 
-        subgraph core[Core CRM]
-            SF1[(Sales Cloud)]
-            SF2[(Service Cloud)]
-            SF3[(Experience Cloud)]
+        subgraph core["Core CRM"]
+            SF1["💼 Sales Cloud<br/><small>Leads, Opps</small>"]
+            SF2["🎧 Service Cloud<br/><small>Cases, Knowledge</small>"]
+            SF3["🌐 Experience Cloud<br/><small>Portals</small>"]
         end
 
-        subgraph automation[Automation]
-            FL[Flows]
-            AP[Apex]
-            PE[Platform Events]
+        subgraph automation["⚡ Automation"]
+            FL["🔄 Flows<br/><small>Process Builder</small>"]
+            AP["⚡ Apex<br/><small>Triggers, Services</small>"]
+            PE["📢 Platform Events<br/><small>CDC, Streaming</small>"]
         end
 
-        subgraph ai[AI & Analytics]
-            EIN[Einstein]
-            TB[Tableau]
-            CRM[CRM Analytics]
+        subgraph ai["🤖 AI & Analytics"]
+            EIN["🧠 Einstein<br/><small>Predictions</small>"]
+            TB["📊 Tableau<br/><small>Dashboards</small>"]
+            CRM["📈 CRM Analytics<br/><small>Reports</small>"]
         end
     end
 
-    subgraph integration[🔄 Integration Layer]
+    subgraph integration["🔄 Integration Layer"]
         direction LR
-        MW[MuleSoft<br/>Anypoint]
-        API[API Gateway]
+        MW["🔗 MuleSoft<br/><small>Anypoint Platform</small>"]
+        API["🔐 API Gateway<br/><small>Named Credentials</small>"]
     end
 
-    subgraph external[🏢 External Systems]
+    subgraph external["🏢 External Systems"]
         direction TB
 
-        subgraph erp[ERP]
-            SAP[SAP S/4HANA]
-            NET[NetSuite]
+        subgraph erp["ERP Systems"]
+            SAP["🏭 SAP S/4HANA<br/><small>Finance, Inventory</small>"]
+            NET["📦 NetSuite<br/><small>Orders</small>"]
         end
 
-        subgraph marketing[Marketing]
-            MC[Marketing Cloud]
-            PAR[Pardot]
+        subgraph marketing["Marketing"]
+            MC["📧 Marketing Cloud<br/><small>Campaigns</small>"]
+            PAR["🎯 Account Engagement<br/><small>Pardot</small>"]
         end
 
-        subgraph data[Data & Storage]
-            DW[Data Warehouse<br/>Snowflake]
-            S3[AWS S3]
+        subgraph data["Data & Storage"]
+            DW["❄️ Snowflake<br/><small>Data Warehouse</small>"]
+            S3["☁️ AWS S3<br/><small>Files</small>"]
         end
     end
 
     %% User connections
-    U1 -->|Salesforce Mobile| SF1
-    U2 -->|Lightning| SF1
-    U2 -->|Lightning| SF2
-    U3 -->|Portal| SF3
+    U1 -->|"Salesforce Mobile"| SF1
+    U2 -->|"Lightning"| SF1
+    U2 -->|"Lightning"| SF2
+    U3 -->|"Portal"| SF3
 
     %% Internal SF connections
     SF1 <--> FL
@@ -96,73 +88,103 @@ flowchart TB
     MW <--> API
 
     %% External connections
-    API <-->|REST/SOAP| SAP
-    API <-->|REST| NET
-    MW <-->|CDC| MC
+    API <-->|"REST/SOAP"| SAP
+    API <-->|"REST"| NET
+    MW <-->|"CDC"| MC
     MW --> PAR
-    MW -->|ETL| DW
-    API -->|Files| S3
+    MW -->|"ETL"| DW
+    API -->|"Files"| S3
 
-    %% Styling
-    classDef salesforce fill:#00A1E0,color:#fff,stroke:#032D60
-    classDef external fill:#04844B,color:#fff,stroke:#032D60
-    classDef integration fill:#FF6D00,color:#fff,stroke:#032D60
-    classDef user fill:#9050E9,color:#fff,stroke:#032D60
+    %% Node Styling - Users (purple)
+    style U1 fill:#9050E9,stroke:#7c3aed,color:#fff
+    style U2 fill:#9050E9,stroke:#7c3aed,color:#fff
+    style U3 fill:#9050E9,stroke:#7c3aed,color:#fff
 
-    class SF1,SF2,SF3,FL,AP,PE,EIN,TB,CRM salesforce
-    class SAP,NET,MC,PAR,DW,S3 external
-    class MW,API integration
-    class U1,U2,U3 user
+    %% Node Styling - Salesforce Core (cyan)
+    style SF1 fill:#06b6d4,stroke:#0891b2,color:#fff
+    style SF2 fill:#06b6d4,stroke:#0891b2,color:#fff
+    style SF3 fill:#06b6d4,stroke:#0891b2,color:#fff
+
+    %% Node Styling - Automation (indigo)
+    style FL fill:#6366f1,stroke:#4f46e5,color:#fff
+    style AP fill:#8b5cf6,stroke:#7c3aed,color:#fff
+    style PE fill:#14b8a6,stroke:#0d9488,color:#fff
+
+    %% Node Styling - AI (pink)
+    style EIN fill:#ec4899,stroke:#db2777,color:#fff
+    style TB fill:#ec4899,stroke:#db2777,color:#fff
+    style CRM fill:#ec4899,stroke:#db2777,color:#fff
+
+    %% Node Styling - Integration (orange)
+    style MW fill:#f97316,stroke:#ea580c,color:#fff
+    style API fill:#f97316,stroke:#ea580c,color:#fff
+
+    %% Node Styling - External (green)
+    style SAP fill:#10b981,stroke:#059669,color:#fff
+    style NET fill:#10b981,stroke:#059669,color:#fff
+    style MC fill:#10b981,stroke:#059669,color:#fff
+    style PAR fill:#10b981,stroke:#059669,color:#fff
+    style DW fill:#f59e0b,stroke:#d97706,color:#fff
+    style S3 fill:#f59e0b,stroke:#d97706,color:#fff
+
+    %% Subgraph Styling - transparent with dashed borders
+    style users fill:transparent,stroke:#9050E9,stroke-dasharray:5
+    style salesforce fill:transparent,stroke:#06b6d4,stroke-dasharray:5
+    style core fill:transparent,stroke:#06b6d4,stroke-dasharray:5
+    style automation fill:transparent,stroke:#6366f1,stroke-dasharray:5
+    style ai fill:transparent,stroke:#ec4899,stroke-dasharray:5
+    style integration fill:transparent,stroke:#f97316,stroke-dasharray:5
+    style external fill:transparent,stroke:#10b981,stroke-dasharray:5
+    style erp fill:transparent,stroke:#10b981,stroke-dasharray:5
+    style marketing fill:transparent,stroke:#10b981,stroke-dasharray:5
+    style data fill:transparent,stroke:#f59e0b,stroke-dasharray:5
 ```
 
 ## Mermaid Template - Agentforce Architecture
 
 ```mermaid
-%%{init: {'theme': 'base', 'themeVariables': {
-  'primaryColor': '#00A1E0'
-}}}%%
 flowchart TB
-    subgraph channels[📱 Channels]
-        WEB[Web Chat]
-        SMS[SMS]
-        WHATS[WhatsApp]
-        SLACK[Slack]
+    subgraph channels["📱 Channels"]
+        WEB["🌐 Web Chat<br/><small>Embedded</small>"]
+        SMS["💬 SMS<br/><small>Twilio</small>"]
+        WHATS["📱 WhatsApp<br/><small>Business</small>"]
+        SLACK["💼 Slack<br/><small>Enterprise</small>"]
     end
 
-    subgraph agentforce[🤖 Agentforce]
+    subgraph agentforce["🤖 Agentforce"]
         direction TB
 
-        subgraph agents[AI Agents]
-            SA[Service Agent]
-            SDA[SDR Agent]
-            COACH[Sales Coach]
+        subgraph agents["AI Agents"]
+            SA["🎧 Service Agent<br/><small>Customer Support</small>"]
+            SDA["📞 SDR Agent<br/><small>Lead Qualification</small>"]
+            COACH["🎯 Sales Coach<br/><small>Guidance</small>"]
         end
 
-        subgraph topics[Topics & Actions]
-            T1[Order Status]
-            T2[Return Request]
-            T3[Lead Qualify]
-            A1[Apex Actions]
-            A2[Flow Actions]
+        subgraph topics["Topics & Actions"]
+            T1["📦 Order Status<br/><small>Track, Update</small>"]
+            T2["🔄 Return Request<br/><small>RMA, Refund</small>"]
+            T3["✅ Lead Qualify<br/><small>Score, Route</small>"]
+            A1["⚡ Apex Actions<br/><small>Custom Logic</small>"]
+            A2["🔄 Flow Actions<br/><small>Automation</small>"]
         end
 
-        subgraph foundation[Foundation]
-            DM[Data Cloud]
-            TRUST[Trust Layer]
-            PROMPT[Prompt Builder]
+        subgraph foundation["Foundation"]
+            DM["☁️ Data Cloud<br/><small>Unified Profile</small>"]
+            TRUST["🔐 Trust Layer<br/><small>Guardrails</small>"]
+            PROMPT["📝 Prompt Builder<br/><small>Templates</small>"]
         end
     end
 
-    subgraph backend[⚙️ Backend]
-        APEX[Apex Services]
-        FLOW[Flow Orchestration]
-        INT[Integrations]
+    subgraph backend["⚙️ Backend"]
+        APEX["⚡ Apex Services<br/><small>Business Logic</small>"]
+        FLOW["🔄 Flow Orchestration<br/><small>Processes</small>"]
+        INT["🔗 Integrations<br/><small>Named Creds</small>"]
     end
 
-    subgraph data[💾 Data Sources]
-        CRM[(CRM Data)]
-        EXT[(External Data)]
-        KB[(Knowledge Base)]
+    subgraph datasources["💾 Data Sources"]
+        CRM[("💼 CRM Data<br/><small>Accounts, Cases</small>")]
+        EXT[("🏭 External Data<br/><small>ERP, APIs</small>")]
+        KB[("📚 Knowledge Base<br/><small>Articles</small>")]
     end
 
     %% Channel to Agent
@@ -196,6 +218,50 @@ flowchart TB
     DM --> CRM
     DM --> EXT
     TRUST --> KB
+
+    %% Node Styling - Channels (slate)
+    style WEB fill:#64748b,stroke:#475569,color:#fff
+    style SMS fill:#64748b,stroke:#475569,color:#fff
+    style WHATS fill:#64748b,stroke:#475569,color:#fff
+    style SLACK fill:#64748b,stroke:#475569,color:#fff
+
+    %% Node Styling - Agents (pink)
+    style SA fill:#ec4899,stroke:#db2777,color:#fff
+    style SDA fill:#ec4899,stroke:#db2777,color:#fff
+    style COACH fill:#ec4899,stroke:#db2777,color:#fff
+
+    %% Node Styling - Topics (purple)
+    style T1 fill:#8b5cf6,stroke:#7c3aed,color:#fff
+    style T2 fill:#8b5cf6,stroke:#7c3aed,color:#fff
+    style T3 fill:#8b5cf6,stroke:#7c3aed,color:#fff
+
+    %% Node Styling - Actions (indigo)
+    style A1 fill:#6366f1,stroke:#4f46e5,color:#fff
+    style A2 fill:#6366f1,stroke:#4f46e5,color:#fff
+
+    %% Node Styling - Foundation (teal)
+    style DM fill:#14b8a6,stroke:#0d9488,color:#fff
+    style TRUST fill:#14b8a6,stroke:#0d9488,color:#fff
+    style PROMPT fill:#14b8a6,stroke:#0d9488,color:#fff
+
+    %% Node Styling - Backend (cyan)
+    style APEX fill:#06b6d4,stroke:#0891b2,color:#fff
+    style FLOW fill:#06b6d4,stroke:#0891b2,color:#fff
+    style INT fill:#f97316,stroke:#ea580c,color:#fff
+
+    %% Node Styling - Data (amber)
+    style CRM fill:#f59e0b,stroke:#d97706,color:#fff
+    style EXT fill:#f59e0b,stroke:#d97706,color:#fff
+    style KB fill:#f59e0b,stroke:#d97706,color:#fff
+
+    %% Subgraph Styling
+    style channels fill:transparent,stroke:#64748b,stroke-dasharray:5
+    style agentforce fill:transparent,stroke:#ec4899,stroke-dasharray:5
+    style agents fill:transparent,stroke:#ec4899,stroke-dasharray:5
+    style topics fill:transparent,stroke:#8b5cf6,stroke-dasharray:5
+    style foundation fill:transparent,stroke:#14b8a6,stroke-dasharray:5
+    style backend fill:transparent,stroke:#06b6d4,stroke-dasharray:5
+    style datasources fill:transparent,stroke:#f59e0b,stroke-dasharray:5
 ```
 
 ## ASCII Fallback Template
@@ -256,15 +322,15 @@ flowchart TB
 
 ## Component Types
 
-| Category | Examples | Icon |
-|----------|----------|------|
-| Users | Sales, Service, Partners | 👥 |
-| Salesforce Clouds | Sales, Service, Marketing | ☁️ |
-| Automation | Flow, Apex, Events | ⚡ |
-| AI/Analytics | Einstein, Tableau, CRM Analytics | 🧠 |
-| Integration | MuleSoft, API Gateway | 🔄 |
-| External Systems | ERP, Marketing, Data | 🏢 |
-| Storage | Database, Data Lake, Files | 💾 |
+| Category | Examples | Icon | Fill Color |
+|----------|----------|------|------------|
+| Users | Sales, Service, Partners | 👥 | `#9050E9` |
+| Salesforce Clouds | Sales, Service, Marketing | ☁️ | `#06b6d4` |
+| Automation | Flow, Apex, Events | ⚡ | `#6366f1` |
+| AI/Analytics | Einstein, Tableau, CRM Analytics | 🤖 | `#ec4899` |
+| Integration | MuleSoft, API Gateway | 🔗 | `#f97316` |
+| External Systems | ERP, Marketing, Data | 🏢 | `#10b981` |
+| Storage | Database, Data Lake, Files | 💾 | `#f59e0b` |
 
 ## Connection Types
 
