@@ -339,6 +339,12 @@ topic orders:
 - Validation fails with: "Variable with type integer is not supported for mutable variables"
 - Use `number` instead for all numeric values (works for both integers and decimals)
 
+**⚠️ CRITICAL: Collection syntax uses SQUARE BRACKETS, not angle brackets!**
+- ✅ CORRECT: `list[string]`, `list[number]`, `list[boolean]`
+- ❌ WRONG: `list<string>` (causes "Unexpected '<'" syntax error)
+- Only primitive types allowed in lists: `string`, `number`, `boolean`
+- `list[object]` is NOT supported
+
 **Notes**:
 - Boolean values must be capitalized: `True`, `False`
 - Linked variables support only: `string`, `number`, `boolean`, `date`, `id`

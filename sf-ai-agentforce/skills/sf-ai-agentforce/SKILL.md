@@ -734,12 +734,45 @@ sf project deploy start --source-dir force-app/main/default/aiAuthoringBundles/[
 sf agent publish authoring-bundle --api-name [AgentName] --target-org [alias]
 ```
 
-**⚠️ Note**: The `sf agent publish` command is in beta and may fail with HTTP 404 errors. If it fails, use Option A (`sf project deploy start`) which is more reliable. Both methods result in the agent being available in the org.
+**⚠️ CRITICAL: NEW Agents vs UPDATING Existing Agents**
+
+| Operation | Use This Method | Reason |
+|-----------|-----------------|--------|
+| **Create NEW agent** | `sf agent publish authoring-bundle` | Required to create BotDefinition |
+| **Update EXISTING agent** | `sf project deploy start` | More reliable, avoids HTTP 404 |
+
+**HTTP 404 Error is BENIGN for NEW Agents**:
+- The `sf agent publish authoring-bundle` command may fail with `ERROR_HTTP_404` during "Retrieve Metadata" step
+- However, if "Publish Agent" step completed (✔), the agent WAS created successfully
+- The error occurs during metadata retrieval, not during agent creation
+- After HTTP 404 error: verify with `sf data query` to confirm agent exists, then activate
+
+**Workflow for NEW Agents** (despite HTTP 404 error):
+```bash
+# 1. Deploy dependencies first (flows, apex)
+sf project deploy start --source-dir force-app/main/default/flows --target-org [alias]
+sf project deploy start --source-dir force-app/main/default/classes --target-org [alias]
+
+# 2. Publish agent (may show HTTP 404 but agent is still created)
+sf agent publish authoring-bundle --api-name [AgentName] --target-org [alias]
+
+# 3. Verify agent was created
+sf data query --query "SELECT Id, DeveloperName FROM BotDefinition WHERE DeveloperName = '[AgentName]'" --target-org [alias]
+
+# 4. Activate (required to make visible in UI)
+sf agent activate --api-name [AgentName] --target-org [alias]
+```
+
+**Workflow for UPDATING Existing Agents**:
+```bash
+# Use sf project deploy start (more reliable, no HTTP 404 issues)
+sf project deploy start --source-dir force-app/main/default/aiAuthoringBundles/[AgentName] --target-org [alias]
+```
 
 The deploy/publish command:
 - Creates Bot, BotVersion, and GenAi metadata
 - Deploys the AiAuthoringBundle to the org
-- Makes agent visible in Agentforce Studio
+- Makes agent visible in Agentforce Studio (after activation)
 
 **Step 4: Verify Deployment**
 ```bash
@@ -923,6 +956,12 @@ system:
 | `long` | Long integers | `big_num: mutable long = 9999999999` | ❌ NOT Supported |
 
 **⚠️ CRITICAL: `integer` and `long` types are NOT supported in AiAuthoringBundle!**
+
+**⚠️ CRITICAL: Collection syntax uses SQUARE BRACKETS, not angle brackets!**
+- ✅ CORRECT: `list[string]`, `list[number]`, `list[boolean]`
+- ❌ WRONG: `list<string>` (causes "Unexpected '<'" syntax error)
+- Only primitive types allowed in lists: `string`, `number`, `boolean`
+- `list[object]` is NOT supported
 - Validation fails with: "Variable with type integer is not supported for mutable variables"
 - Use `number` instead for all numeric values (works for both integers and decimals)
 - These types may be supported in GenAiPlannerBundle or future releases
