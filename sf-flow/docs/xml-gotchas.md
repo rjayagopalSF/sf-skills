@@ -412,6 +412,104 @@ When generating flows programmatically or manually editing XML:
 | "field 'X.Y' doesn't exist" | Relationship field in queriedFields | Use two-step query pattern |
 | "$Record__Prior can only be used..." | Using $Record__Prior with Create trigger | Change to Update or CreateAndUpdate |
 | "You can't use the Flows action type..." | Subflow in AutoLaunchedFlow | Use inline logic instead |
+| "nothing is connected to the Start element" | Empty flow with no elements | Add at least one assignment connected to start |
+
+---
+
+## Start Element Must Have Connector (For Agentforce Flow Actions)
+
+**⚠️ DEPLOYMENT BLOCKER**: Flows used as Agent Script actions MUST have at least one element connected to the Start element.
+
+### What Doesn't Work
+
+```xml
+<!-- ❌ THIS WILL FAIL DEPLOYMENT -->
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>65.0</apiVersion>
+    <label>My Agent Flow</label>
+    <processType>AutoLaunchedFlow</processType>
+    <status>Active</status>
+
+    <variables>
+        <name>inp_SearchQuery</name>
+        <dataType>String</dataType>
+        <isInput>true</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+
+    <start>
+        <locationX>50</locationX>
+        <locationY>50</locationY>
+        <!-- No connector! -->
+    </start>
+</Flow>
+```
+
+**Error**: `field integrity exception: unknown (The flow can't run because nothing is connected to the Start element.)`
+
+### Why This Happens
+
+- Minimal flows with only inputs/outputs and no logic still need at least one element
+- Salesforce validates that the flow has something to execute
+- This is especially common when creating stub/mock flows for testing
+
+### Correct Pattern: Add Assignment Element
+
+Even for simple pass-through flows, add at least one assignment:
+
+```xml
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>65.0</apiVersion>
+    <label>My Agent Flow</label>
+    <processType>AutoLaunchedFlow</processType>
+    <status>Active</status>
+
+    <variables>
+        <name>inp_SearchQuery</name>
+        <dataType>String</dataType>
+        <isInput>true</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+    <variables>
+        <name>out_Result</name>
+        <dataType>String</dataType>
+        <isInput>false</isInput>
+        <isOutput>true</isOutput>
+    </variables>
+
+    <!-- ✅ Start connected to assignment -->
+    <start>
+        <locationX>50</locationX>
+        <locationY>50</locationY>
+        <connector>
+            <targetReference>Set_Result</targetReference>
+        </connector>
+    </start>
+
+    <!-- ✅ At least one element required -->
+    <assignments>
+        <name>Set_Result</name>
+        <label>Set Result</label>
+        <locationX>176</locationX>
+        <locationY>158</locationY>
+        <assignmentItems>
+            <assignToReference>out_Result</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <stringValue>Success</stringValue>
+            </value>
+        </assignmentItems>
+    </assignments>
+</Flow>
+```
+
+### When Creating Agentforce Flow Actions
+
+1. **Define inputs** matching Agent Script action `inputs:`
+2. **Define outputs** matching Agent Script action `outputs:`
+3. **Add at least one assignment** to set output values
+4. **Connect start to assignment** via `<connector>`
+5. **Set status to Active** for agent to invoke
 
 ---
 
