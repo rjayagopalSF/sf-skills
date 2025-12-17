@@ -1,3 +1,7 @@
+<!-- TIER: 3 | DETAILED REFERENCE -->
+<!-- Read after: SKILL.md, agent-script-quick-reference.md -->
+<!-- Read before: Specialized guides (connection-block-guide.md, etc.) -->
+
 # Agent Script Syntax Reference
 
 Complete syntax reference for the Agent Script language used in Agentforce.
@@ -882,6 +886,63 @@ topic my_topic:
       instructions: ->
          | Help the user with their order.
 ```
+
+### Action-Level Attributes (Advanced)
+
+Beyond `inputs`, `outputs`, `target`, and `description`, actions support additional attributes for controlling behavior:
+
+| Attribute | Type | Description | Default |
+|-----------|------|-------------|---------|
+| `require_user_confirmation` | Boolean | Prompt user to confirm before executing | `False` |
+| `include_in_progress_indicator` | Boolean | Show progress indicator during execution | `False` |
+| `label` | String | Display label for the action | Action name |
+
+**Example with Advanced Attributes:**
+```agentscript
+actions:
+   cancel_order:
+      description: "Cancels an order and issues refund"
+      require_user_confirmation: True    # ★ Ask user before executing destructive action
+      include_in_progress_indicator: True # ★ Show "Processing..." indicator
+      label: "Cancel Order"
+      inputs:
+         order_id: string
+            description: "Order to cancel"
+         reason: string
+            description: "Cancellation reason"
+      outputs:
+         refund_amount: number
+            description: "Refund amount"
+      target: "flow://Cancel_Order"
+```
+
+**When to Use:**
+- `require_user_confirmation: True` - For destructive operations (delete, cancel), financial transactions, or any action with significant consequences
+- `include_in_progress_indicator: True` - For long-running operations where users should know processing is happening
+
+### Referencing Actions in Instructions
+
+You can reference actions in reasoning instructions to guide LLM behavior. This is **different from invoking actions** - it's a hint to the LLM about available capabilities.
+
+```agentscript
+reasoning:
+   instructions: ->
+      | Help the customer with their order inquiry.
+      |
+      | Available capabilities:
+      | - Use {!@actions.get_order_status} to look up order details when they provide an order ID
+      | - Use {!@actions.update_order} if they want to modify their order (requires confirmation)
+      | - Use {!@actions.cancel_order} if they want to cancel (requires confirmation)
+      |
+      | Always confirm destructive actions before proceeding.
+
+   actions:
+      lookup: @actions.get_order_status
+         with order_id=...
+      # ... other action invocations
+```
+
+**⚠️ Important**: This `{!@actions.x}` reference in instructions is **NOT invocation** - it's documentation for the LLM. Actual invocation happens in the `actions:` block within reasoning.
 
 ### Target Formats
 

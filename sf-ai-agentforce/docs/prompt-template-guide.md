@@ -1,3 +1,7 @@
+<!-- TIER: 4 | SPECIALIZED GUIDE -->
+<!-- Read after: agent-actions-guide.md -->
+<!-- Purpose: Deep dive for PromptTemplate metadata and generatePromptResponse:// actions -->
+
 # Prompt Template Guide
 
 > Complete guide to creating PromptTemplate metadata for Salesforce Einstein and Agentforce

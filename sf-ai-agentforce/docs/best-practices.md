@@ -1,3 +1,7 @@
+<!-- TIER: 3 | DETAILED REFERENCE -->
+<!-- Read after: SKILL.md, agent-script-syntax.md -->
+<!-- Read before: pattern-catalog.md (for specific patterns) -->
+
 # Agent Script Best Practices
 
 ## Overview
@@ -50,20 +54,23 @@ topic customer_stuff:
 
 ## 2. Variable Management
 
-### Always Initialize Variables
+### Initialize Variables with Defaults (Recommended)
 
 ```agentscript
 variables:
-    # ✅ GOOD - Has default value
+    # ✅ RECOMMENDED - Has default value (clearer intent)
     user_name: mutable string = ""
         description: "Customer's full name"
 
     order_count: mutable number = 0
         description: "Number of orders in cart"
 
-    # ❌ BAD - No default (will cause issues)
+    # ✅ ALSO VALID - Works but less explicit
     # user_name: mutable string
+    #     description: "Customer's full name"
 ```
+
+> **Note**: Variables without defaults ARE supported in both deployment methods. However, providing defaults is recommended for clarity and to avoid potential issues with uninitialized state.
 
 ### Use Appropriate Types
 

@@ -1,7 +1,11 @@
 ---
 name: sf-ai-agentforce
-description: Creates Agentforce agents using Agent Script syntax. Generates complete agents with topics, actions, and variables. 100-point scoring across 6 categories. API v64+ required.
+description: Creates Agentforce agents using Agent Script syntax. Generates complete agents with topics, actions, and variables. 100-point scoring across 6 categories. API v64+ (AiAuthoringBundle) or v65+ (GenAiPlannerBundle).
 ---
+
+<!-- TIER: 1 | ENTRY POINT -->
+<!-- This is the starting document - read this FIRST -->
+<!-- Progressive disclosure: SKILL.md → Quick Refs → Detailed Refs → Specialized Guides -->
 
 # sf-ai-agentforce: Agentforce Agent Creation with Agent Script
 
@@ -15,16 +19,31 @@ Expert Agentforce developer specializing in Agent Script syntax, topic design, a
 4. **Validation & Scoring**: Score agents against best practices (0-100 points)
 5. **Deployment**: Publish agents using `sf agent publish authoring-bundle`
 
-## 📚 Document Map
+## 📚 Document Map (Progressive Disclosure)
 
+**Read documents in tier order based on what you need:**
+
+### Tier 2: Quick References
 | Need | Document | Description |
 |------|----------|-------------|
-| **Complete syntax reference** | [agent-script-syntax.md](../../docs/agent-script-syntax.md) | Full Agent Script language spec, all blocks, types |
-| **AiAuthoringBundle gotchas** | [agent-script-quick-reference.md](../../docs/agent-script-quick-reference.md) | What DOESN'T work, error quick reference |
+| **What doesn't work** | [agent-script-quick-reference.md](../../docs/agent-script-quick-reference.md) | AiAuthoringBundle gotchas, error quick reference |
+| **Which pattern to use** | [pattern-catalog.md](../../docs/pattern-catalog.md) | Decision tree for choosing patterns |
+| **What command to run** | [agent-cli-reference.md](../../docs/agent-cli-reference.md) | sf agent commands, preview, publish |
+
+### Tier 3: Detailed References
+| Need | Document | Description |
+|------|----------|-------------|
+| **Full syntax** | [agent-script-syntax.md](../../docs/agent-script-syntax.md) | Complete Agent Script language spec |
 | **Action implementation** | [agent-actions-guide.md](../../docs/agent-actions-guide.md) | Flow, Apex, API, Prompt Template actions |
-| **Escalation setup** | [connection-block-guide.md](../../docs/connection-block-guide.md) | OmniChannelFlow routing, human handoff |
-| **CLI commands** | [agent-cli-reference.md](../../docs/agent-cli-reference.md) | sf agent commands, preview, publish |
-| **Design patterns** | [pattern-catalog.md](../../docs/pattern-catalog.md) | Multi-topic, error handling, routing patterns |
+| **Best practices** | [best-practices.md](../../docs/best-practices.md) | Production-ready agent design |
+
+### Tier 4: Specialized Guides
+| Need | Document | Description |
+|------|----------|-------------|
+| **Escalation/routing** | [connection-block-guide.md](../../docs/connection-block-guide.md) | OmniChannelFlow, human handoff |
+| **Prompt templates** | [prompt-template-guide.md](../../docs/prompt-template-guide.md) | PromptTemplate metadata |
+| **GenAiFunction metadata** | [genai-function-reference.md](../../docs/genai-function-reference.md) | Wrapping Apex/Flows as actions |
+| **Testing/preview** | [agent-preview-guide.md](../../docs/agent-preview-guide.md) | sf agent preview guide |
 
 **⚡ Quick Links:**
 - [Key Insights Table](#-key-insights) - Common errors and fixes
@@ -514,7 +533,9 @@ If Flow defines 6 input variables but Agent Script only provides 4, publish fail
 
 ### Advanced Action Fields with `object` Type (Tested Dec 2025)
 
-For fine-grained control over action behavior, use the `object` type with `complex_data_type_name` and advanced field attributes:
+For fine-grained control over action behavior, use the `object` type with `complex_data_type_name` and advanced field attributes.
+
+> **⚠️ Note**: The `filter_from_agent` attribute shown below is **GenAiPlannerBundle only**. It causes "Unexpected 'filter_from_agent'" errors in AiAuthoringBundle. Omit this attribute when using `sf agent publish authoring-bundle`.
 
 ```agentscript
 actions:

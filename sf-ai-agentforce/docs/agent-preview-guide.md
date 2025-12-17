@@ -1,3 +1,7 @@
+<!-- TIER: 4 | SPECIALIZED GUIDE -->
+<!-- Read after: agent-cli-reference.md -->
+<!-- Purpose: Deep dive for testing/previewing agents before deployment -->
+
 # Agent Preview Guide
 
 > Complete guide for previewing Agentforce agents using the SF CLI
@@ -275,5 +279,5 @@ sf project deploy start --metadata Flow --target-org myorg
 ## Related Documentation
 
 - [Agent CLI Reference](./agent-cli-reference.md)
-- [Testing and Validation Guide](./testing-validation-guide.md)
+- [Agent Script Quick Reference](./agent-script-quick-reference.md)
 - [Agent Actions Guide](./agent-actions-guide.md)

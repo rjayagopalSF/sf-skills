@@ -1,3 +1,7 @@
+<!-- TIER: 4 | SPECIALIZED GUIDE -->
+<!-- Read after: agent-actions-guide.md -->
+<!-- Purpose: Deep dive for GenAiFunction metadata (wrapping Apex/Flows as Agent Actions) -->
+
 # GenAiFunction Metadata Reference
 
 > Complete reference for GenAiFunction metadata structure in Salesforce Agentforce

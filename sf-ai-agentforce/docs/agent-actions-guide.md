@@ -1,3 +1,7 @@
+<!-- TIER: 3 | DETAILED REFERENCE -->
+<!-- Read after: SKILL.md, agent-script-syntax.md -->
+<!-- Read before: genai-function-reference.md (for GenAiFunction metadata details) -->
+
 # Agent Actions Guide
 
 > Comprehensive guide to creating and deploying Agent Actions in Salesforce Agentforce

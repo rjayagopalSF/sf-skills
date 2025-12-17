@@ -1,3 +1,7 @@
+<!-- TIER: 4 | SPECIALIZED GUIDE -->
+<!-- Read after: agent-script-syntax.md, agent-actions-guide.md -->
+<!-- Purpose: Deep dive for escalation and external routing configuration -->
+
 # Connection Block Guide
 
 > Configure external integrations and escalation routing for Agentforce agents

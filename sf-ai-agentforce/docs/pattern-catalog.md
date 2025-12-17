@@ -1,3 +1,7 @@
+<!-- TIER: 2 | QUICK REFERENCE -->
+<!-- Read after: SKILL.md (entry point) -->
+<!-- Read before: agent-script-syntax.md (for implementation details) -->
+
 # Agent Script Pattern Catalog
 
 A decision-focused guide to choosing the right patterns for your Agentforce agent.
@@ -50,12 +54,14 @@ A decision-focused guide to choosing the right patterns for your Agentforce agen
 
 **Purpose**: Execute code automatically before and after every reasoning step.
 
+> **⚠️ Deployment Note**: The `run` keyword in lifecycle blocks is **GenAiPlannerBundle only**. AiAuthoringBundle supports `before_reasoning` / `after_reasoning` with `set` statements, but NOT the `run` keyword. Use `sf project deploy start` (not `sf agent publish authoring-bundle`).
+
 **Key Syntax**:
 ```agentscript
 topic conversation:
    before_reasoning:
       set @variables.turn_count = @variables.turn_count + 1
-      run @actions.refresh_context
+      run @actions.refresh_context                    # ⚠️ GenAiPlannerBundle only
          with user_id=@variables.EndUserId
          set @variables.context = @outputs.fresh_context
 
@@ -64,7 +70,7 @@ topic conversation:
          | Turn {!@variables.turn_count}: {!@variables.context}
 
    after_reasoning:
-      run @actions.log_analytics
+      run @actions.log_analytics                      # ⚠️ GenAiPlannerBundle only
          with turn=@variables.turn_count
 ```
 
@@ -86,14 +92,16 @@ topic conversation:
 
 **Purpose**: Chain deterministic follow-up actions using the `run` keyword.
 
+> **⚠️ Deployment Note**: The `run` keyword is **GenAiPlannerBundle only**. Use `sf project deploy start` (not `sf agent publish authoring-bundle`). Agents using `run` will NOT be visible in Agentforce Studio.
+
 **Key Syntax**:
 ```agentscript
 process_order: @actions.create_order
    with customer_id=@variables.customer_id
    set @variables.order_id = @outputs.order_id
-   run @actions.send_confirmation
+   run @actions.send_confirmation                    # ⚠️ GenAiPlannerBundle only
       with order_id=@variables.order_id
-   run @actions.log_activity
+   run @actions.log_activity                         # ⚠️ GenAiPlannerBundle only
       with event="ORDER_CREATED"
 ```
 
@@ -266,5 +274,5 @@ Patterns can be combined for complex scenarios:
 ## Related Documentation
 
 - [Agent Script Syntax Reference](agent-script-syntax.md) - Complete syntax guide
-- [Testing & Validation Guide](testing-validation-guide.md) - Deployment testing
+- [Agent Script Quick Reference](agent-script-quick-reference.md) - Error quick reference
 - [Anti-Patterns](agent-script-syntax.md#anti-patterns) - What to avoid

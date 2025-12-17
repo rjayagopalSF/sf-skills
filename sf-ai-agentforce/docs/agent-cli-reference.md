@@ -1,3 +1,7 @@
+<!-- TIER: 2 | QUICK REFERENCE -->
+<!-- Read after: SKILL.md (entry point) -->
+<!-- Read before: agent-preview-guide.md (for detailed testing) -->
+
 # Agent CLI Command Reference
 
 > Complete reference for Salesforce CLI commands used with Agentforce agents

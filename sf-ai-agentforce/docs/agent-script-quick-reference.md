@@ -1,3 +1,7 @@
+<!-- TIER: 2 | QUICK REFERENCE -->
+<!-- Read after: SKILL.md (entry point) -->
+<!-- Read before: agent-script-syntax.md (for full syntax details) -->
+
 # Agent Script Quick Reference
 
 **AiAuthoringBundle Compatibility Guide - December 2025**
