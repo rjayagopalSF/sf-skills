@@ -774,13 +774,13 @@ Score: XX/120 Rating
 | sf-connected-apps | OAuth Connected App for Named Credential |
 | sf-apex | Custom callout service beyond templates |
 | sf-metadata | Query existing Named Credentials |
-| **sf-devops-architect** | ⚠️ MANDATORY for ALL deployments |
+| sf-deploy | Deploy to org |
 | sf-ai-agentforce | Agent action using External Service |
 | sf-flow | HTTP Callout Flow for agent |
 
 ### Agentforce Integration Flow
 
-`sf-integration` → Named Credential + External Service → `sf-flow` → HTTP Callout wrapper → `sf-ai-agentforce` → Agent with `flow://` target → `sf-devops-architect` → Deploy all
+`sf-integration` → Named Credential + External Service → `sf-flow` → HTTP Callout wrapper → `sf-ai-agentforce` → Agent with `flow://` target → `sf-deploy` → Deploy all
 
 ---
 

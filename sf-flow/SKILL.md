@@ -42,11 +42,9 @@ python3 ~/.claude/plugins/marketplaces/sf-skills/sf-flow-builder/hooks/scripts/v
 
 ## ⚠️ CRITICAL: Orchestration Order
 
-**sf-metadata → sf-flow → sf-devops-architect → sf-data** (you are here: sf-flow)
+**sf-metadata → sf-flow → sf-deploy → sf-data** (you are here: sf-flow)
 
 ⚠️ Flow references custom object/fields? Create with sf-metadata FIRST. Deploy objects BEFORE flows.
-
-⚠️ ALL deployments MUST go through **sf-devops-architect** sub-agent (which delegates to sf-deploy).
 
 See `shared/docs/orchestration.md` (project root) for details.
 
@@ -197,23 +195,13 @@ If ANY of these patterns would be generated, **STOP and ask the user**:
 
 **DO NOT generate anti-patterns even if explicitly requested.** Ask user to confirm the exception with documented justification.
 
-### Phase 4: Deployment & Integration (MANDATORY: Use sf-devops-architect)
-
-⚠️ **MANDATORY: Use sf-devops-architect sub-agent** - NEVER use direct CLI commands or sf-deploy skill directly.
-
-**Why sf-devops-architect is mandatory:**
-1. Centralized deployment orchestration
-2. Proper deployment ordering (dependencies first)
-3. Automatic --dry-run validation
-4. Consistent error handling and troubleshooting
+### Phase 4: Deployment & Integration
 
 **Pattern**:
-1. `Task(subagent_type="sf-devops-architect", prompt="Deploy flow [path] to [org] with --dry-run")`
+1. `Skill(skill="sf-deploy", args="Deploy flow [path] to [org] with --dry-run")`
 2. Review validation results
-3. `Task(subagent_type="sf-devops-architect", prompt="Proceed with actual deployment")`
-4. Edit `<status>Draft</status>` → `Active`, redeploy via sf-devops-architect
-
-❌ NEVER use `Skill(skill="sf-deploy")` directly - always route through sf-devops-architect.
+3. `Skill(skill="sf-deploy", args="Proceed with actual deployment")`
+4. Edit `<status>Draft</status>` → `Active`, redeploy
 
 **For Agentforce Flows**: Variable names must match Agent Script input/output names exactly.
 
@@ -359,14 +347,14 @@ screens → start → status → subflows → textTemplates → variables → wa
 
 See `shared/docs/cross-skill-integration.md` (project root)
 
-**Deployment**: See Phase 4 above - sf-devops-architect is MANDATORY.
+**Deployment**: See Phase 4 above.
 
 ### ⚠️ Flows for sf-ai-agentforce
 
 **When sf-ai-agentforce requests a Flow:**
 - sf-ai-agentforce will invoke sf-flow (this skill) to create Flows
 - sf-flow creates the validated Flow XML
-- sf-devops-architect handles deployment to org (delegates to sf-deploy)
+- sf-deploy handles deployment to org
 - Only THEN can sf-ai-agentforce use `flow://FlowName` targets
 
 **Variable Name Matching**: When creating Flows for Agentforce agents:
@@ -377,7 +365,7 @@ See `shared/docs/cross-skill-integration.md` (project root)
 | Direction | Pattern |
 |-----------|---------|
 | sf-flow → sf-metadata | "Describe Invoice__c" (verify fields before flow) |
-| sf-flow → **sf-devops-architect** | Deploy with validation - **MANDATORY** |
+| sf-flow → sf-deploy | Deploy with validation |
 | sf-flow → sf-data | "Create 200 test Accounts" (test data after deploy) |
 | sf-ai-agentforce → sf-flow | "Create Autolaunched Flow for agent action" - **sf-flow is MANDATORY** |
 

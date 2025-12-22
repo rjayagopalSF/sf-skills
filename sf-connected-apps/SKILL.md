@@ -141,9 +141,9 @@ See `shared/docs/scoring-overview.md` (project root). Block deployment if score 
 
 ### Phase 5: Deployment & Documentation
 
-**Deployment via sf-devops-architect** (MANDATORY):
+**Deployment**:
 ```
-Task(subagent_type="sf-devops-architect", prompt="Deploy connected apps at force-app/main/default/connectedApps/ to [target-org] with --dry-run")
+Skill(skill="sf-deploy", args="Deploy connected apps at force-app/main/default/connectedApps/ to [target-org] with --dry-run")
 ```
 
 **Completion Summary**:
@@ -352,10 +352,10 @@ For **External Client Apps**, add these features to your scratch org definition:
 
 ## Cross-Skill Integration
 
-| Skill/Agent | When to Use | Example |
-|-------------|-------------|---------|
+| Skill | When to Use | Example |
+|-------|-------------|---------|
 | sf-metadata | Create Named Credentials for secure callouts | `Skill(skill="sf-metadata")` → "Create Named Credential for Stripe API" |
-| **sf-devops-architect** | ⚠️ MANDATORY for deployment | `Task(subagent_type="sf-devops-architect", ...)` |
+| sf-deploy | Deploy to org | `Skill(skill="sf-deploy", args="Deploy to [org]")` |
 | sf-apex | Create Apex for OAuth token handling | `Skill(skill="sf-apex")` → "Create OAuth token refresh service" |
 
 ---

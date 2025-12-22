@@ -105,21 +105,17 @@ If ANY of these patterns would be generated, **STOP and ask the user**:
 
 **DO NOT generate anti-patterns even if explicitly requested.** Ask user to confirm the exception with documented justification.
 
-### Phase 4: Deployment (MANDATORY: Use sf-devops-architect)
-
-⚠️ **ALL deployments MUST go through sf-devops-architect sub-agent.**
+### Phase 4: Deployment
 
 **Step 1: Validation**
 ```
-Task(subagent_type="sf-devops-architect", prompt="Deploy classes at force-app/main/default/classes/ to [target-org] with --dry-run")
+Skill(skill="sf-deploy", args="Deploy classes at force-app/main/default/classes/ to [target-org] with --dry-run")
 ```
 
 **Step 2: Deploy** (only if validation succeeds)
 ```
-Task(subagent_type="sf-devops-architect", prompt="Proceed with actual deployment to [target-org]")
+Skill(skill="sf-deploy", args="Proceed with actual deployment to [target-org]")
 ```
-
-❌ NEVER use `Skill(skill="sf-deploy")` directly - always route through sf-devops-architect.
 
 ### Phase 5: Documentation & Testing Guidance
 
@@ -358,11 +354,11 @@ See `docs/trigger-actions-framework.md` (in sf-apex folder) for full patterns.
 
 ## Cross-Skill Integration
 
-| Skill/Agent | When to Use | Example |
-|-------------|-------------|---------|
+| Skill | When to Use | Example |
+|-------|-------------|---------|
 | sf-metadata | Discover object/fields before coding | `Skill(skill="sf-metadata")` → "Describe Invoice__c" |
 | sf-data | Generate 251+ test records after deploy | `Skill(skill="sf-data")` → "Create 251 Accounts for bulk testing" |
-| **sf-devops-architect** | ⚠️ MANDATORY - see Phase 4 | `Task(subagent_type="sf-devops-architect", ...)` |
+| sf-deploy | Deploy to org - see Phase 4 | `Skill(skill="sf-deploy", args="Deploy to [org]")` |
 
 ## Dependencies
 

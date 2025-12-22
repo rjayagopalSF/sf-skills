@@ -222,10 +222,8 @@ AskUserQuestion:
 
 ### Phase 4: Deployment
 
-**⚠️ MANDATORY: Use sf-devops-architect for ALL deployments**
-
 ```
-Task(subagent_type="sf-devops-architect", prompt="Deploy metadata at force-app/main/default/objects/[ObjectName] and permission set to [target-org]")
+Skill(skill="sf-deploy", args="Deploy metadata at force-app/main/default/objects/[ObjectName] and permission set to [target-org]")
 ```
 
 **Post-deployment** (optional - assign permission set):

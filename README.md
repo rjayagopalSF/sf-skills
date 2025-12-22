@@ -73,14 +73,6 @@ sf-apex/
 | 📊 | **[sf-diagram](sf-diagram/)** | Mermaid diagrams & ERD | ✅ Stable |
 | 🛠️ | **[skill-builder](skill-builder/)** | Skill creation wizard | ✅ Stable |
 
-## 🏗️ Available Sub-Agents
-
-| | Sub-Agent | Description | Status |
-|--|-----------|-------------|--------|
-| 🚦 | **[sf-devops-architect](agents/)** | MANDATORY deployment gateway - orchestrates all Salesforce deployments | ✅ Live |
-
-> **Skills vs Sub-Agents**: Skills are invoked with `Skill(skill="name")`. Sub-agents are invoked with `Task(subagent_type="name", ...)` and can run autonomously in the background.
-
 ## 🚀 Installation
 
 First, add the marketplace to Claude Code:
@@ -95,7 +87,7 @@ First, add the marketplace to Claude Code:
   <img src="https://img.youtube.com/vi/a38MM8PBTe4/maxresdefault.jpg" alt="How to Add/Install Skills to ClaudeCode" />
 </a>
 
-## 🔗 Skill & Sub-Agent Architecture
+## 🔗 Skill Architecture
 
 ```mermaid
 %%{init: {"flowchart": {"nodeSpacing": 80, "rankSpacing": 70}} }%%
@@ -118,10 +110,6 @@ flowchart TB
     subgraph foundation["📦 FOUNDATION"]
         metadata["📋 sf-metadata"]
         data["💾 sf-data"]
-    end
-
-    subgraph gateway["🚦 DEPLOYMENT GATEWAY (Sub-Agent)"]
-        devopsarchitect["🏗️ sf-devops-architect"]
     end
 
     subgraph devops["🚀 DEVOPS"]
@@ -155,16 +143,13 @@ flowchart TB
     %% Foundation relationships
     data -->|"structure"| metadata
 
-    %% MANDATORY Deployment Gateway - ALL deployments go through sf-devops-architect
-    apex ==>|"MANDATORY"| devopsarchitect
-    flow ==>|"MANDATORY"| devopsarchitect
-    metadata ==>|"MANDATORY"| devopsarchitect
-    sfintegration ==>|"MANDATORY"| devopsarchitect
-    connectedapps ==>|"MANDATORY"| devopsarchitect
-    agentforce ==>|"MANDATORY"| devopsarchitect
-
-    %% Gateway delegates to sf-deploy skill
-    devopsarchitect -->|"delegates"| deploy
+    %% Deployment - all skills can deploy via sf-deploy
+    apex -->|"deploy"| deploy
+    flow -->|"deploy"| deploy
+    metadata -->|"deploy"| deploy
+    sfintegration -->|"deploy"| deploy
+    connectedapps -->|"deploy"| deploy
+    agentforce -->|"deploy"| deploy
 
     %% Styling - AI (pink-200)
     style agentforce fill:#fbcfe8,stroke:#be185d,color:#1f2937
@@ -182,9 +167,6 @@ flowchart TB
     style metadata fill:#a5f3fc,stroke:#0e7490,color:#1f2937
     style data fill:#fde68a,stroke:#b45309,color:#1f2937
 
-    %% Styling - Gateway Sub-Agent (rose-300 with thick border)
-    style devopsarchitect fill:#fda4af,stroke:#be123c,stroke-width:3px,color:#1f2937
-
     %% Styling - DevOps (emerald-200)
     style deploy fill:#a7f3d0,stroke:#047857,color:#1f2937
 
@@ -196,58 +178,16 @@ flowchart TB
     style integration fill:#fff7ed,stroke:#c2410c,stroke-dasharray:5
     style development fill:#f5f3ff,stroke:#6d28d9,stroke-dasharray:5
     style foundation fill:#ecfeff,stroke:#0e7490,stroke-dasharray:5
-    style gateway fill:#ffe4e6,stroke:#be123c,stroke-width:2px
     style devops fill:#ecfdf5,stroke:#047857,stroke-dasharray:5
     style tooling fill:#f8fafc,stroke:#334155,stroke-dasharray:5
 ```
 
-### 🚦 Deployment Gateway
+### 🚀 Deployment
 
-**ALL deployments MUST go through the `sf-devops-architect` sub-agent:**
+**Use the sf-deploy skill for all Salesforce deployments:**
 
 ```
-Task(subagent_type="sf-devops-architect", prompt="Deploy to [org]")
-```
-
-| ❌ Wrong | ✅ Correct |
-|----------|------------|
-| `sf project deploy start ...` | `Task(subagent_type="sf-devops-architect", ...)` |
-| `Skill(skill="sf-deploy")` | `Task(subagent_type="sf-devops-architect", ...)` |
-
-The gateway ensures consistent validation, orchestration, and deployment workflows.
-
-### ⚡ Async Deployment (Non-Blocking)
-
-Run deployments in the background while continuing other work:
-
-```python
-# Launch deployment in background (returns immediately)
-Task(
-  subagent_type="sf-devops-architect",
-  prompt="Deploy to Production",
-  run_in_background=true    # ← Key parameter!
-)
-
-# Continue working while deployment runs...
-
-# Check status (non-blocking)
-TaskOutput(task_id="agent-id", block=false)
-
-# Wait for results when ready
-TaskOutput(task_id="agent-id", block=true)
-```
-
-**Parallel Deployments Example:**
-```python
-# Deploy to multiple orgs simultaneously
-Task(..., prompt="Deploy to Dev", run_in_background=true)
-Task(..., prompt="Deploy to QA", run_in_background=true)
-Task(..., prompt="Deploy to UAT", run_in_background=true)
-
-# Collect results later
-TaskOutput(task_id="dev-id", block=true)
-TaskOutput(task_id="qa-id", block=true)
-TaskOutput(task_id="uat-id", block=true)
+Skill(skill="sf-deploy", args="Deploy to [org]")
 ```
 
 ## 🔌 Plugin Features
@@ -454,7 +394,7 @@ sf-industry-{name}        # Industries (healthcare, finserv)
 | 🏦 | `sf-industry-finserv` | KYC, AML, Wealth Management | 📋 Planned |
 | 💵 | `sf-industry-revenue` | CPQ, Billing, Revenue Lifecycle | 📋 Planned |
 
-**Total: 24 skills + 1 sub-agent** (10 skills ✅ + 1 sub-agent ✅ live, 14 planned 📋)
+**Total: 24 skills** (10 skills ✅ live, 14 planned 📋)
 
 ## Contributing
 
