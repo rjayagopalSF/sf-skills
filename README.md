@@ -59,8 +59,8 @@ sf-apex/
 | **Codex CLI** | ✅ Installer | `.codex/skills/` | ![OpenAI](https://img.shields.io/badge/OpenAI-Codex-412991?logo=openai&logoColor=white) |
 | **Gemini CLI** | ✅ Installer | `~/.gemini/skills/` | ![Google](https://img.shields.io/badge/Google-Gemini_CLI-4285F4?logo=google&logoColor=white) |
 | **Amp CLI** | ✅ Compatible | `.claude/skills/` | ![Amp](https://img.shields.io/badge/Sourcegraph-Amp-FF5543?logo=sourcegraph&logoColor=white) |
-| **Droid CLI** | ✅ Compatible | `.factory/skills/` | ![Factory](https://img.shields.io/badge/Factory.ai-Droid-6366F1?logo=robot&logoColor=white) |
-| **Cursor CLI** | 🔗 Via Bridge | `.cursor/rules/` | ![Cursor](https://img.shields.io/badge/Cursor-Agent_CLI-000000?logo=cursor&logoColor=white) |
+| **Droid CLI** | ✅ Installer | `.factory/skills/` | ![Factory](https://img.shields.io/badge/Factory.ai-Droid-6366F1?logo=robot&logoColor=white) |
+| **Cursor** | ✅ Installer | `.cursor/rules/` | ![Cursor](https://img.shields.io/badge/Cursor-Agent_CLI-000000?logo=cursor&logoColor=white) |
 | **Agentforce Vibes** | ⏳ Pending Cline | `.clinerules/` | ![Salesforce](https://img.shields.io/badge/Salesforce-Vibes-00A1E0?logo=salesforce&logoColor=white) |
 
 > **Agent Skills Open Standard:** These skills follow the [Agent Skills specification](https://agentskills.io) for cross-CLI compatibility.
@@ -70,31 +70,37 @@ sf-apex/
 <details>
 <summary><b>Droid CLI</b> (Factory.ai) — Claude Code Compatible</summary>
 
-Droid CLI (v0.26.0+) natively supports Claude Code skills format. Skills can be imported directly:
+Droid CLI (v0.26.0+) natively supports Claude Code skills format. Use the installer or import directly:
 
 ```bash
-# Droid auto-discovers skills from .claude/skills/ directory
-# Or use the /skills command within Droid to manage skills
+# Install via installer
+python tools/installer.py --cli droid --all
+
+# Or Droid auto-discovers skills from .claude/skills/ directory
+# Use the /skills command within Droid to manage skills
 ```
 
 - **Install Path:** `.factory/skills/` or `~/.factory/skills/`
 - **Format:** Claude Code compatible (SKILL.md + scripts/)
+- **Prerequisite:** Enable Custom Droids in `/settings → Experimental`
 - **Docs:** [docs.factory.ai/cli/configuration/skills](https://docs.factory.ai/cli/configuration/skills)
 
 </details>
 
 <details>
-<summary><b>Cursor CLI</b> — Via SkillPort Bridge</summary>
+<summary><b>Cursor</b> — Installer with MDC Transformation</summary>
 
-Cursor uses its own rules system (`.cursor/rules/` with MDC format). Agent Skills require the [SkillPort](https://github.com/gotalab/skillport) bridge:
+Cursor uses its own rules system (`.cursor/rules/` with MDC format). The installer transforms skills to Cursor's native format:
 
 ```bash
-# Install SkillPort MCP server for Cursor
-# Skills are then accessible via MCP integration
+# Install skills transformed to MDC format
+python tools/installer.py --cli cursor --all
 ```
 
-- **Native Format:** `.cursor/rules/*.mdc` (Markdown with metadata)
-- **Skills Bridge:** SkillPort MCP server
+- **Install Path:** `.cursor/rules/{name}.mdc`
+- **Format:** MDC (Markdown with YAML frontmatter: description, globs, alwaysApply)
+- **Templates:** Copied to `assets/`, docs to `references/`
+- **Alternative:** [SkillPort](https://github.com/gotalab/skillport) MCP bridge for runtime skill access
 - **Docs:** [docs.cursor.com/context/rules-for-ai](https://docs.cursor.com/context/rules-for-ai)
 
 </details>
@@ -143,7 +149,7 @@ Add the marketplace to Claude Code:
 /plugin marketplace add Jaganpro/sf-skills
 ```
 
-### Other CLIs (OpenCode, Codex, Gemini)
+### Other CLIs (OpenCode, Codex, Gemini, Droid, Cursor)
 
 Use the installer script to transform and install skills for other agentic CLIs:
 
@@ -152,21 +158,26 @@ Use the installer script to transform and install skills for other agentic CLIs:
 git clone https://github.com/Jaganpro/sf-skills
 cd sf-skills
 
-# Install all skills for OpenCode
-python tools/installer.py --cli opencode --all
+# Install all skills for a specific CLI
+python tools/installer.py --cli opencode --all    # OpenCode
+python tools/installer.py --cli codex --all       # Codex (OpenAI)
+python tools/installer.py --cli gemini --all      # Gemini (Google)
+python tools/installer.py --cli droid --all       # Droid (Factory.ai)
+python tools/installer.py --cli cursor --all      # Cursor (MDC format)
 
-# Install specific skills for Gemini
+# Install specific skills
 python tools/installer.py --cli gemini --skills sf-apex sf-flow sf-deploy
 
 # Auto-detect installed CLIs and install all skills
 python tools/installer.py --detect --all
 
-# List available skills
+# List available skills and CLIs
 python tools/installer.py --list
+python tools/installer.py --list-clis
 ```
 
 The installer:
-- Transforms SKILL.md for CLI compatibility
+- Transforms SKILL.md for CLI compatibility (MDC format for Cursor)
 - Bundles shared modules for self-contained installation
 - Exports validation hooks as standalone scripts
 - Generates README with manual validation instructions
