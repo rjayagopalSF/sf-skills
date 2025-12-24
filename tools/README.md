@@ -4,11 +4,13 @@ Install sf-skills to different agentic coding CLIs following the [Agent Skills o
 
 ## Supported CLIs
 
-| CLI | Install Path | Description |
-|-----|--------------|-------------|
-| **OpenCode** | `.opencode/skill/{name}/` | Open-source Claude Code alternative |
-| **Codex CLI** | `.codex/skills/{name}/` | OpenAI's coding CLI |
-| **Gemini CLI** | `~/.gemini/skills/{name}/` | Google's Gemini-powered CLI |
+| CLI | Install Path | Format | Description |
+|-----|--------------|--------|-------------|
+| **OpenCode** | `.opencode/skill/{name}/` | SKILL.md | Open-source Claude Code alternative |
+| **Codex CLI** | `.codex/skills/{name}/` | SKILL.md | OpenAI's coding CLI |
+| **Gemini CLI** | `~/.gemini/skills/{name}/` | SKILL.md | Google's Gemini-powered CLI |
+| **Droid CLI** | `.factory/skills/{name}/` | SKILL.md | Factory.ai's agentic CLI (Claude Code compatible) |
+| **Cursor** | `.cursor/rules/{name}.mdc` | MDC | Cursor IDE rules (transformed format) |
 
 > **Note:** Claude Code support remains via the native `.claude-plugin/` structure in each skill directory. This installer is for *other* CLIs.
 
@@ -32,7 +34,7 @@ python tools/installer.py --detect --all
 ## Usage
 
 ```
-usage: installer.py [-h] [--cli {opencode,codex,gemini}] [--detect]
+usage: installer.py [-h] [--cli {opencode,codex,gemini,droid,cursor}] [--detect]
                     [--skills SKILLS [SKILLS ...]] [--all]
                     [--target TARGET] [--force] [--list] [--list-clis]
 
@@ -40,7 +42,7 @@ Install sf-skills to different agentic coding CLIs
 
 optional arguments:
   -h, --help            show this help message and exit
-  --cli {opencode,codex,gemini}
+  --cli {opencode,codex,gemini,droid,cursor}
                         Target CLI to install for
   --detect              Auto-detect installed CLIs
   --skills SKILLS [SKILLS ...]
@@ -91,7 +93,7 @@ python tools/installer.py --cli codex --target /path/to/project/.codex/skills/ -
 python tools/installer.py --detect --all
 ```
 
-Detects installed CLIs (OpenCode, Codex, Gemini) and installs skills to each.
+Detects installed CLIs (OpenCode, Codex, Gemini, Droid, Cursor) and installs skills to each.
 
 ### Force Reinstall
 
@@ -119,14 +121,14 @@ Each installed skill contains:
 
 ### Key Transformations
 
-| Source | OpenCode | Codex | Gemini |
-|--------|----------|-------|--------|
-| `SKILL.md` | `SKILL.md` | `SKILL.md` | `SKILL.md` |
-| `.claude-plugin/*` | (skipped) | (skipped) | (skipped) |
-| `hooks/scripts/*.py` | `scripts/*.py` | `scripts/*.py` | `scripts/*.py` |
-| `templates/` | `templates/` | `assets/` | `templates/` |
-| `docs/` | `docs/` | `references/` | `docs/` |
-| `shared/*` | `scripts/shared/` | `scripts/shared/` | `scripts/shared/` |
+| Source | OpenCode | Codex | Gemini | Droid | Cursor |
+|--------|----------|-------|--------|-------|--------|
+| `SKILL.md` | `SKILL.md` | `SKILL.md` | `SKILL.md` | `SKILL.md` | `{name}.mdc` |
+| `.claude-plugin/*` | (skipped) | (skipped) | (skipped) | (skipped) | (skipped) |
+| `hooks/scripts/*.py` | `scripts/*.py` | `scripts/*.py` | `scripts/*.py` | `scripts/*.py` | `scripts/*.py` |
+| `templates/` | `templates/` | `assets/` | `templates/` | `templates/` | `assets/` |
+| `docs/` | `docs/` | `references/` | `docs/` | `docs/` | `references/` |
+| `shared/*` | `scripts/shared/` | `scripts/shared/` | `scripts/shared/` | `scripts/shared/` | `scripts/shared/` |
 
 ## Running Validation Scripts
 
@@ -164,6 +166,33 @@ python validate_flow.py /path/to/MyFlow.flow-meta.xml
 - Can symlink with Claude Code: `ln -s ~/.gemini/skills/sf-apex ~/.claude/skills/sf-apex`
 - Benefits from Gemini's 1M+ token context window
 
+### Droid CLI (Factory.ai)
+
+- Claude Code compatible - uses same SKILL.md format
+- Installs to `.factory/skills/` (project) or `~/.factory/skills/` (user)
+- Can also auto-discover from `.claude/skills/` directory
+- Requires Custom Droids enabled: `/settings → Experimental → Custom Droids`
+- Docs: [docs.factory.ai/cli/configuration/skills](https://docs.factory.ai/cli/configuration/skills)
+
+### Cursor
+
+- Uses MDC (Markdown with metadata) format instead of SKILL.md
+- Skills are transformed into `.mdc` rule files with YAML frontmatter
+- Installs to `.cursor/rules/` directory
+- For full Agent Skills support, consider [SkillPort](https://github.com/gotalab/skillport) MCP bridge
+- Validation scripts available but must be run manually
+
+**Cursor MDC Format:**
+```yaml
+---
+description: Salesforce Apex development skill
+globs: ["**/*.cls", "**/*.trigger"]
+alwaysApply: false
+---
+
+# Skill content here...
+```
+
 ## Troubleshooting
 
 ### "No skills found in repository"
@@ -197,6 +226,8 @@ The auto-detect feature checks for:
 - OpenCode: `opencode` command or `~/.opencode/` directory
 - Codex: `codex` command
 - Gemini: `gemini` command or `~/.gemini/` directory
+- Droid: `droid` command or `~/.factory/` directory
+- Cursor: `cursor` command or `~/.cursor/` directory
 
 If your CLI is installed but not detected, use `--cli` explicitly.
 

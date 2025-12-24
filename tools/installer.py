@@ -117,6 +117,14 @@ def detect_installed_clis() -> List[str]:
     if shutil.which("gemini") or Path.home().joinpath(".gemini").exists():
         detected.append("gemini")
 
+    # Check for Droid CLI (Factory.ai)
+    if shutil.which("droid") or Path.home().joinpath(".factory").exists():
+        detected.append("droid")
+
+    # Check for Cursor (IDE with CLI)
+    if shutil.which("cursor") or Path.home().joinpath(".cursor").exists():
+        detected.append("cursor")
+
     return detected
 
 
