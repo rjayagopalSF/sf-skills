@@ -255,12 +255,24 @@ In flowchart format:
 - Lookup: `-->` (single arrow)
 - Master-Detail: `==>` (thick double arrow)
 
-### Cloud-Specific Templates
+### Data Model Templates
 
 | Template | Objects | Path |
 |----------|---------|------|
-| Sales Cloud | Account, Contact, Lead, Opportunity, Product, Campaign | `templates/datamodel/sales-cloud-erd.md` |
-| Service Cloud | Case, Entitlement, Knowledge, ServiceContract | `templates/datamodel/service-cloud-erd.md` |
+| **Core** | Account, Contact, Opportunity, Case | `templates/datamodel/salesforce-erd.md` |
+| **Sales Cloud** | Account, Contact, Lead, Opportunity, Product, Campaign | `templates/datamodel/sales-cloud-erd.md` |
+| **Service Cloud** | Case, Entitlement, Knowledge, ServiceContract | `templates/datamodel/service-cloud-erd.md` |
+| **Campaigns** | Campaign, CampaignMember, CampaignInfluence | `templates/datamodel/campaigns-erd.md` |
+| **Territory Management** | Territory2, Territory2Model, UserTerritory2Association | `templates/datamodel/territory-management-erd.md` |
+| **Party Model** | AccountContactRelation, ContactContactRelation | `templates/datamodel/party-model-erd.md` |
+| **Quote & Order** | Quote, QuoteLineItem, Order, OrderItem | `templates/datamodel/quote-order-erd.md` |
+| **Forecasting** | ForecastingItem, ForecastingQuota, OpportunitySplit | `templates/datamodel/forecasting-erd.md` |
+| **Consent (GDPR)** | Individual, ContactPointEmail, DataUsePurpose | `templates/datamodel/consent-erd.md` |
+| **Files** | ContentDocument, ContentVersion, ContentDocumentLink | `templates/datamodel/files-erd.md` |
+| **Scheduler** | ServiceAppointment, ServiceResource, ServiceTerritory | `templates/datamodel/scheduler-erd.md` |
+| **Field Service** | WorkOrder, ServiceAppointment, TimeSheet | `templates/datamodel/fsl-erd.md` |
+| **B2B Commerce** | WebStore, WebCart, BuyerGroup, BuyerAccount | `templates/datamodel/b2b-commerce-erd.md` |
+| **Revenue Cloud** | ProductCatalog, ProductSellingModel, PriceAdjustment | `templates/datamodel/revenue-cloud-erd.md` |
 
 ### ERD Conventions Documentation
 
