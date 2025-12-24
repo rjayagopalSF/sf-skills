@@ -7,8 +7,11 @@ Language Server Protocol integration for Salesforce development skills in Claude
 This module provides a shared LSP engine that enables real-time validation of Salesforce files during Claude Code authoring sessions. Currently supports:
 
 - **Agent Script** (`.agent` files) - via Salesforce VS Code extension
+- **Apex** (`.cls`, `.trigger` files) - via Salesforce Apex extension
 
 ## Prerequisites
+
+### For Agent Script (.agent files)
 
 1. **VS Code with Agent Script Extension**
    - Open VS Code
@@ -19,6 +22,19 @@ This module provides a shared LSP engine that enables real-time validation of Sa
 2. **Node.js 18+**
    - Required by the LSP server
    - Check: `node --version`
+
+### For Apex (.cls, .trigger files)
+
+1. **VS Code with Salesforce Extension Pack**
+   - Open VS Code
+   - Go to Extensions (Cmd+Shift+X)
+   - Search: "Salesforce Extension Pack"
+   - Install
+
+2. **Java 11+ (Adoptium/OpenJDK recommended)**
+   - Required by the Apex LSP server
+   - Check: `java --version`
+   - Download: https://adoptium.net/temurin/releases/
 
 ## Usage
 
@@ -57,8 +73,9 @@ python3 lsp_client.py /path/to/file.agent
 ```
 lsp-engine/
 ├── __init__.py              # Package exports
-├── agentscript_wrapper.sh   # Shell wrapper for LSP server
-├── lsp_client.py            # Python LSP client
+├── agentscript_wrapper.sh   # Shell wrapper for Agent Script LSP
+├── apex_wrapper.sh          # Shell wrapper for Apex LSP
+├── lsp_client.py            # Python LSP client (multi-language)
 ├── diagnostics.py           # Diagnostic formatting
 └── README.md               # This file
 ```
@@ -68,26 +85,51 @@ lsp-engine/
 | Variable | Description | Default |
 |----------|-------------|---------|
 | `LSP_LOG_FILE` | Path to log file | `/dev/null` |
-| `NODE_PATH` | Custom Node.js path | Auto-detected |
+| `NODE_PATH` | Custom Node.js path (Agent Script) | Auto-detected |
+| `JAVA_HOME` | Custom Java path (Apex) | Auto-detected |
+| `APEX_LSP_MEMORY` | JVM heap size in MB (Apex) | 2048 |
 
 ## Troubleshooting
 
-### "LSP server not found"
+### Agent Script Issues
+
+#### "LSP server not found"
 
 The VS Code Agent Script extension is not installed:
 1. Install from VS Code Marketplace
 2. Verify: `ls ~/.vscode/extensions/salesforce.agent-script-*`
 
-### "Node.js not found"
+#### "Node.js not found"
 
 Install Node.js 18+:
 - macOS: `brew install node`
 - Or download from https://nodejs.org
 
-### "Node.js version too old"
+#### "Node.js version too old"
 
 Upgrade to Node.js 18+:
 - macOS: `brew upgrade node`
+
+### Apex Issues
+
+#### "Apex Language Server not found"
+
+The VS Code Salesforce Extension Pack is not installed:
+1. Install from VS Code Marketplace: "Salesforce Extension Pack"
+2. Verify: `ls ~/.vscode/extensions/salesforce.salesforcedx-vscode-apex-*`
+3. Check JAR exists: `ls ~/.vscode/extensions/salesforce.salesforcedx-vscode-apex-*/dist/apex-jorje-lsp.jar`
+
+#### "Java not found"
+
+Install Java 11+:
+- macOS: `brew install openjdk@11`
+- Or download from https://adoptium.net/temurin/releases/
+
+#### "Java version too old"
+
+Upgrade to Java 11+:
+- macOS: `brew install openjdk@21`
+- Set JAVA_HOME: `export JAVA_HOME=/opt/homebrew/opt/openjdk@21`
 
 ## How It Works
 

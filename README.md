@@ -227,6 +227,23 @@ Hooks integrate [Salesforce Code Analyzer V5](https://developer.salesforce.com/d
 
 **Graceful Degradation:** If dependencies are missing, hooks run custom validation only and show which engines were skipped.
 
+#### 🔤 Language Server Protocol (LSP) Integration
+
+Skills leverage official Salesforce LSP servers for real-time syntax validation with auto-fix loops:
+
+| | Skill | File Type | LSP Server | Runtime |
+|--|-------|-----------|------------|---------|
+| 🤖 | sf-ai-agentforce | `*.agent` | Agent Script Language Server | Node.js 18+ |
+| ⚡ | sf-apex | `*.cls`, `*.trigger` | apex-jorje-lsp.jar | Java 11+ |
+
+**How Auto-Fix Loops Work:**
+1. Claude writes/edits a file
+2. LSP hook validates syntax (~500ms)
+3. If errors found → Claude receives diagnostics and auto-fixes
+4. Repeat up to 3 attempts
+
+**Prerequisites:** VS Code with Salesforce extensions installed (LSP servers are bundled with the extensions).
+
 **Sample Output:**
 ```
 🔍 Apex Validation: AccountService.cls

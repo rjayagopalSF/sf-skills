@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """
-LSP Client for Agent Script Language Server
-============================================
+LSP Client for Language Server Protocol
+========================================
 
-This module provides a Python interface to the Agent Script LSP server
+This module provides a Python interface to LSP servers
 for use in Claude Code hooks.
 
 Features:
-- Auto-discovers VS Code Agent Script extension
+- Works with any LSP server (Agent Script, Apex, etc.)
 - Communicates via JSON-RPC over stdio
 - Returns parsed diagnostics for validation hooks
 """
@@ -20,19 +20,35 @@ from pathlib import Path
 from typing import Optional, Dict, List, Any
 
 
-class LSPClient:
-    """Client for communicating with the Agent Script LSP server."""
+# Language ID mapping based on file extension
+EXTENSION_TO_LANGUAGE = {
+    ".agent": "agentscript",
+    ".cls": "apex",
+    ".trigger": "apex",
+    ".apex": "apex",
+}
 
-    def __init__(self, wrapper_path: Optional[str] = None):
+
+class LSPClient:
+    """Client for communicating with an LSP server."""
+
+    def __init__(self, wrapper_path: Optional[str] = None, language_id: Optional[str] = None):
         """
         Initialize the LSP client.
 
         Args:
             wrapper_path: Path to the LSP wrapper script. If None, auto-discovers.
+            language_id: Language ID for the LSP server. If None, auto-detects from file extension.
         """
         self.wrapper_path = wrapper_path or self._find_wrapper()
+        self.language_id = language_id
         self._server_process: Optional[subprocess.Popen] = None
         self._request_id = 0
+
+    def _detect_language_id(self, file_path: str) -> str:
+        """Detect language ID from file extension."""
+        ext = Path(file_path).suffix.lower()
+        return EXTENSION_TO_LANGUAGE.get(ext, "apex")
 
     def _find_wrapper(self) -> str:
         """Find the LSP wrapper script relative to this module."""
@@ -186,10 +202,11 @@ class LSPClient:
 
             # Open document
             file_uri = f"file://{os.path.abspath(file_path)}"
+            lang_id = self.language_id or self._detect_language_id(file_path)
             did_open_params = {
                 "textDocument": {
                     "uri": file_uri,
-                    "languageId": "agentscript",
+                    "languageId": lang_id,
                     "version": 1,
                     "text": content,
                 }
@@ -210,7 +227,7 @@ class LSPClient:
                             "severity": diag.get("severity", 1),
                             "message": diag.get("message", "Unknown error"),
                             "range": diag.get("range", {}),
-                            "source": diag.get("source", "agentscript"),
+                            "source": diag.get("source", lang_id),
                             "code": diag.get("code", ""),
                         })
 
