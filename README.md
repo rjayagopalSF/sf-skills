@@ -257,7 +257,7 @@ python tools/installer.py --cli agentforce-vibes --all
 |--|-------|-------------|----------|--------|--------|
 | ⚡ | **[sf-apex](sf-apex/)** | Apex generation, TAF patterns, LSP validation | 💻 Development | 150 | 🔬 Alpha |
 | 🔄 | **[sf-flow](sf-flow/)** | Flow creation & bulk validation | 💻 Development | 110 | 🔬 Alpha |
-| ⚡ | **[sf-lwc](sf-lwc/)** | Lightning Web Components, Jest tests, LMS | 💻 Development | 130 | 🔬 Alpha |
+| ⚡ | **[sf-lwc](sf-lwc/)** | Lightning Web Components, Jest tests, LMS | 💻 Development | 140 | 🔬 Alpha |
 | 🔍 | **[sf-soql](sf-soql/)** | Natural language → SOQL, query optimization | 💻 Development | 100 | 🔬 Alpha |
 | 🧪 | **[sf-testing](sf-testing/)** | Apex test runner, coverage, bulk testing | 🧪 Quality | 100 | 🔬 Alpha |
 | 🐛 | **[sf-debug](sf-debug/)** | Debug log analysis, governor limit fixes | 🧪 Quality | 90 | 🔬 Alpha |
@@ -460,7 +460,7 @@ Each skill includes validation hooks that run automatically on **Write** and **E
 |--|-------|-----------|------------|
 | ⚡ | sf-apex | `*.cls`, `*.trigger` | 150-pt scoring + Code Analyzer + LSP |
 | 🔄 | sf-flow | `*.flow-meta.xml` | 110-pt scoring + Flow Scanner |
-| ⚡ | sf-lwc | `*.js`, `*.html` (LWC) | 130-pt scoring + LSP |
+| ⚡ | sf-lwc | `*.js`, `*.html` (LWC) | 140-pt scoring + Code Analyzer + LSP |
 | 🔍 | sf-soql | `*.soql` | 100-pt scoring + selectivity checks |
 | 🧪 | sf-testing | `*Test.cls` | 100-pt scoring + coverage analysis |
 | 🐛 | sf-debug | Debug logs | 90-pt scoring + governor analysis |
@@ -488,6 +488,7 @@ Hooks integrate [Salesforce Code Analyzer V5](https://developer.salesforce.com/d
 |-----------|--------------|------------|
 | **Apex** (150-pt) | PMD 55 rules + Python 8 checks | Security (100%), Bulkification, Testing, Architecture, Clean Code, Error Handling, Performance, Documentation |
 | **Flow** (110-pt) | 32+ checks (21/24 LFS rules) | Design/Naming, Logic/Structure, Error Handling, Architecture, Security, Performance |
+| **LWC** (140-pt) | ESLint + retire-js + SLDS Linter | SLDS 2 Compliance, Naming, Accessibility, Component Patterns, Lightning Message Service, Security |
 
 **Graceful Degradation:** If dependencies are missing, hooks run custom validation only and show which engines were skipped.
 
