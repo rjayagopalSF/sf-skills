@@ -120,6 +120,13 @@ site/
 .mypy_cache/
 .ruff_cache/
 
+# Installer output directories (generated)
+.clinerules/
+.opencode/
+.codex/
+.factory/
+.cursor/rules/
+
 # Coverage reports
 htmlcov/
 .tox/

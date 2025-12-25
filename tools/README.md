@@ -11,6 +11,8 @@ Install sf-skills to different agentic coding CLIs following the [Agent Skills o
 | **Gemini CLI** | `~/.gemini/skills/{name}/` | SKILL.md | Google's Gemini-powered CLI |
 | **Droid CLI** | `.factory/skills/{name}/` | SKILL.md | Factory.ai's agentic CLI (Claude Code compatible) |
 | **Cursor** | `.cursor/rules/{name}.mdc` | MDC | Cursor IDE rules (transformed format) |
+| **Cline** | `.clinerules/{name}.md` | Markdown | VS Code extension with MCP support |
+| **Agentforce Vibes** | `.clinerules/{name}.md` | Markdown | Salesforce fork of Cline |
 
 > **Note:** Claude Code support remains via the native `.claude-plugin/` structure in each skill directory. This installer is for *other* CLIs.
 
@@ -34,7 +36,7 @@ python tools/installer.py --detect --all
 ## Usage
 
 ```
-usage: installer.py [-h] [--cli {opencode,codex,gemini,droid,cursor}] [--detect]
+usage: installer.py [-h] [--cli {opencode,codex,gemini,droid,cursor,cline,agentforce-vibes}] [--detect]
                     [--skills SKILLS [SKILLS ...]] [--all]
                     [--target TARGET] [--force] [--list] [--list-clis]
 
@@ -42,7 +44,7 @@ Install sf-skills to different agentic coding CLIs
 
 optional arguments:
   -h, --help            show this help message and exit
-  --cli {opencode,codex,gemini,droid,cursor}
+  --cli {opencode,codex,gemini,droid,cursor,cline,agentforce-vibes}
                         Target CLI to install for
   --detect              Auto-detect installed CLIs
   --skills SKILLS [SKILLS ...]
@@ -121,14 +123,16 @@ Each installed skill contains:
 
 ### Key Transformations
 
-| Source | OpenCode | Codex | Gemini | Droid | Cursor |
-|--------|----------|-------|--------|-------|--------|
-| `SKILL.md` | `SKILL.md` | `SKILL.md` | `SKILL.md` | `SKILL.md` | `{name}.mdc` |
-| `.claude-plugin/*` | (skipped) | (skipped) | (skipped) | (skipped) | (skipped) |
-| `hooks/scripts/*.py` | `scripts/*.py` | `scripts/*.py` | `scripts/*.py` | `scripts/*.py` | `scripts/*.py` |
-| `templates/` | `templates/` | `assets/` | `templates/` | `templates/` | `assets/` |
-| `docs/` | `docs/` | `references/` | `docs/` | `docs/` | `references/` |
-| `shared/*` | `scripts/shared/` | `scripts/shared/` | `scripts/shared/` | `scripts/shared/` | `scripts/shared/` |
+| Source | OpenCode | Codex | Gemini | Droid | Cursor | Cline |
+|--------|----------|-------|--------|-------|--------|-------|
+| `SKILL.md` | `SKILL.md` | `SKILL.md` | `SKILL.md` | `SKILL.md` | `{name}.mdc` | `{nn}-{name}.md` |
+| `.claude-plugin/*` | (skipped) | (skipped) | (skipped) | (skipped) | (skipped) | (skipped) |
+| `hooks/scripts/*.py` | `scripts/*.py` | `scripts/*.py` | `scripts/*.py` | `scripts/*.py` | `scripts/*.py` | (skipped) |
+| `templates/` | `templates/` | `assets/` | `templates/` | `templates/` | `assets/` | (inlined) |
+| `docs/` | `docs/` | `references/` | `docs/` | `docs/` | `references/` | (skipped) |
+| `shared/*` | `scripts/shared/` | `scripts/shared/` | `scripts/shared/` | `scripts/shared/` | `scripts/shared/` | (skipped) |
+
+> **Note for Cline/Agentforce Vibes:** Templates are inlined into the markdown rules. Scripts and docs are not included since Cline doesn't support automatic validation hooks.
 
 ## Running Validation Scripts
 
@@ -193,6 +197,53 @@ alwaysApply: false
 # Skill content here...
 ```
 
+### Cline
+
+[Cline](https://cline.bot) is an open-source AI coding agent for VS Code with strong MCP support.
+
+- Uses pure markdown files in `.clinerules/` directory
+- Files are auto-combined in alphanumeric order (numbered prefixes: `01-sf-apex.md`, etc.)
+- Templates are inlined directly into the markdown rules
+- No YAML frontmatter required (unlike Cursor)
+- No automatic validation hooks (Cline doesn't support them)
+
+**Installation:**
+```bash
+python tools/installer.py --cli cline --all
+```
+
+**Output structure:**
+```
+.clinerules/
+├── 01-sf-apex.md
+├── 02-sf-flow.md
+├── 03-sf-lwc.md
+└── ... (13 skills total)
+```
+
+### Agentforce Vibes
+
+[Agentforce Vibes](https://developer.salesforce.com/docs/platform/einstein-for-devs/guide/einstein-overview.html) is Salesforce's enterprise vibe-coding tool, built on a fork of Cline.
+
+- Uses the same `.clinerules/` format as Cline
+- Includes Agentforce-specific tips (e.g., `/newrule` command reference)
+- Integrates with Salesforce DX MCP Server for additional tools
+- Available in VS Code and Open VSX marketplaces
+
+**Installation:**
+```bash
+python tools/installer.py --cli agentforce-vibes --all
+```
+
+**Key Differences from Cline:**
+- Additional Agentforce-specific guidance in footer
+- References to Salesforce DX MCP Server integration
+- Tips for using `/newrule` command for custom rules
+
+**Learn More:**
+- [Agentforce Vibes Blog](https://developer.salesforce.com/blogs/2025/10/unleash-your-innovation-with-agentforce-vibes-vibe-coding-for-the-enterprise)
+- [Five Pro Tips](https://developer.salesforce.com/blogs/2025/12/five-pro-tips-for-using-agentforce-vibes)
+
 ## Troubleshooting
 
 ### "No skills found in repository"
@@ -228,6 +279,8 @@ The auto-detect feature checks for:
 - Gemini: `gemini` command or `~/.gemini/` directory
 - Droid: `droid` command or `~/.factory/` directory
 - Cursor: `cursor` command or `~/.cursor/` directory
+- Cline: Not auto-detected (use `--cli cline` explicitly)
+- Agentforce Vibes: Not auto-detected (use `--cli agentforce-vibes` explicitly)
 
 If your CLI is installed but not detected, use `--cli` explicitly.
 
