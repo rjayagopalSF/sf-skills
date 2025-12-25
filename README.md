@@ -97,16 +97,18 @@ Claude Code is the **recommended** platform for sf-skills with full native suppo
 
 | Feature | Claude Code | Agentforce Vibes |
 |---------|-------------|------------------|
+| **Platform** | Terminal CLI | VS Code Extension |
 | **Skills System** | ✅ Native (`SKILL.md` + hooks + templates) | ❌ No skills — uses `.clinerules` markdown |
 | **Automatic Hooks** | ✅ Validation on Write/Edit (150+ point rubrics) | ❌ No hooks — manual validation only |
-| **LSP Integration** | ✅ Real-time Apex, Agent Script, LWC validation | ❌ No LSP — relies on external linters |
+| **LSP Integration** | ✅ Agentic auto-fix loops (detect → fix → validate) | ✅ Via VS Code (manual fixes only) |
 | **Tool Execution** | ✅ Local tools (zero latency) | ⚡ MCP-based (JSON-RPC overhead) |
-| **Templates** | ✅ Dynamic references (50+ templates) | 📄 Inlined in markdown (larger file size) |
-| **Context Window** | 200K tokens | Varies by model (GPT-5, SFR) |
-| **Salesforce DX MCP** | ❌ Not needed (uses `sf` CLI directly) | ✅ 20+ tools for org connectivity |
+| **Salesforce Tools** | `sf` CLI + pre-templated skill scripts | Salesforce DX MCP (20+ tools) |
+| **Templates** | ✅ Dynamic references (50+ templates) | 📄 Inlined in markdown |
+| **Models** | Claude Sonnet 4, Opus 4.5 | GPT-4.1, SFR (Salesforce Research) |
+| **Context Window** | 200K (Sonnet) or 1M (extended) | Varies by model |
 | **Enterprise Features** | Community-driven | Trust Layer, audit logging |
 
-> **Bottom line:** Claude Code offers deeper integration (hooks, LSP, local tools) for Salesforce development. Agentforce Vibes provides enterprise compliance and native Salesforce ecosystem integration via MCP.
+> **Bottom line:** Claude Code offers deeper integration (hooks, agentic LSP auto-fix, local tools) for Salesforce development. Agentforce Vibes provides enterprise compliance and native Salesforce ecosystem integration via MCP.
 
 <details>
 <summary><b>OpenCode CLI</b> — Open-Source Claude Code Alternative</summary>
