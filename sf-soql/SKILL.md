@@ -532,6 +532,34 @@ Install: `/plugin install github:Jaganpro/sf-skills/sf-soql`
 
 ---
 
+## Documentation
+
+| Document | Description |
+|----------|-------------|
+| [soql-reference.md](docs/soql-reference.md) | Complete SOQL syntax reference |
+| [cli-commands.md](docs/cli-commands.md) | SF CLI query commands |
+| [anti-patterns.md](docs/anti-patterns.md) | Common mistakes and how to avoid them |
+| [selector-patterns.md](docs/selector-patterns.md) | Query abstraction patterns (vanilla Apex) |
+
+## Templates
+
+| Template | Description |
+|----------|-------------|
+| [basic-queries.soql](templates/basic-queries.soql) | Basic SOQL syntax examples |
+| [aggregate-queries.soql](templates/aggregate-queries.soql) | COUNT, SUM, GROUP BY patterns |
+| [relationship-queries.soql](templates/relationship-queries.soql) | Parent-child traversals |
+| [optimization-patterns.soql](templates/optimization-patterns.soql) | Selectivity and indexing |
+| [selector-class.cls](templates/selector-class.cls) | Selector class template |
+| [bulkified-query-pattern.cls](templates/bulkified-query-pattern.cls) | Map-based bulk lookups |
+
+---
+
+## Credits
+
+See [CREDITS.md](CREDITS.md) for acknowledgments of community resources that shaped this skill.
+
+---
+
 ## License
 
 MIT License. See [LICENSE](LICENSE) file.

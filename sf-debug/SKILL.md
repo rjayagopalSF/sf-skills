@@ -454,6 +454,33 @@ When enabled, sf-debug will automatically:
 
 ---
 
+## Documentation
+
+| Document | Description |
+|----------|-------------|
+| [debug-log-reference.md](docs/debug-log-reference.md) | Complete debug log event reference |
+| [cli-commands.md](docs/cli-commands.md) | SF CLI debugging commands |
+| [benchmarking-guide.md](docs/benchmarking-guide.md) | Dan Appleman's technique, real-world benchmarks |
+| [log-analysis-tools.md](docs/log-analysis-tools.md) | Apex Log Analyzer, manual analysis patterns |
+
+## Templates
+
+| Template | Description |
+|----------|-------------|
+| [cpu-heap-optimization.cls](templates/cpu-heap-optimization.cls) | CPU and heap optimization patterns |
+| [benchmarking-template.cls](templates/benchmarking-template.cls) | Ready-to-run benchmark comparisons |
+| [soql-in-loop-fix.cls](templates/soql-in-loop-fix.cls) | SOQL bulkification pattern |
+| [dml-in-loop-fix.cls](templates/dml-in-loop-fix.cls) | DML bulkification pattern |
+| [null-pointer-fix.cls](templates/null-pointer-fix.cls) | Null-safe patterns |
+
+---
+
+## Credits
+
+See [CREDITS.md](CREDITS.md) for acknowledgments of community resources that shaped this skill.
+
+---
+
 ## Dependencies
 
 **Required**: Target org with `sf` CLI authenticated

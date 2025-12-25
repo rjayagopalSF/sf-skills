@@ -468,6 +468,34 @@ Install: `/plugin install github:Jaganpro/sf-skills/sf-testing`
 
 ---
 
+## Documentation
+
+| Document | Description |
+|----------|-------------|
+| [testing-best-practices.md](docs/testing-best-practices.md) | General testing guidelines |
+| [cli-commands.md](docs/cli-commands.md) | SF CLI test commands |
+| [mocking-patterns.md](docs/mocking-patterns.md) | Mocking vs Stubbing, DML mocking, HttpCalloutMock |
+| [performance-optimization.md](docs/performance-optimization.md) | Fast tests, reduce execution time |
+
+## Templates
+
+| Template | Description |
+|----------|-------------|
+| [basic-test.cls](templates/basic-test.cls) | Standard test class with Given-When-Then |
+| [bulk-test.cls](templates/bulk-test.cls) | 251+ record bulk testing |
+| [mock-callout-test.cls](templates/mock-callout-test.cls) | HTTP callout mocking |
+| [test-data-factory.cls](templates/test-data-factory.cls) | Reusable test data creation |
+| [dml-mock.cls](templates/dml-mock.cls) | DML abstraction for 35x faster tests |
+| [stub-provider-example.cls](templates/stub-provider-example.cls) | StubProvider for dynamic behavior |
+
+---
+
+## Credits
+
+See [CREDITS.md](CREDITS.md) for acknowledgments of community resources that shaped this skill.
+
+---
+
 ## License
 
 MIT License. See [LICENSE](LICENSE) file.
