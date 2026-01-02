@@ -93,6 +93,58 @@ def validate_apex_with_ca(file_path: str) -> dict:
             ca_engines_unavailable = [f"Scanner error: {e}"]
 
         # ═══════════════════════════════════════════════════════════════════
+        # PHASE 2.5: Live Query Plan Analysis (if org connected)
+        # ═══════════════════════════════════════════════════════════════════
+        live_plan_results = []
+        org_name = None
+        live_plan_available = False
+
+        try:
+            from code_analyzer.live_query_plan import LiveQueryPlanAnalyzer
+            from soql_extractor import SOQLExtractor
+
+            # Read file content for SOQL extraction
+            with open(file_path, 'r') as f:
+                file_content = f.read()
+
+            analyzer = LiveQueryPlanAnalyzer()
+            if analyzer.is_org_available():
+                live_plan_available = True
+                org_name = analyzer.get_target_org()
+
+                # Extract SOQL queries from Apex
+                extractor = SOQLExtractor(file_content, "apex")
+                queries = extractor.extract()
+
+                # Analyze each query (limit to first 5 to avoid timeout)
+                for query_info in queries[:5]:
+                    # Skip dynamic variable queries
+                    if query_info.query_type == 'dynamic_variable':
+                        continue
+
+                    plan_result = analyzer.analyze(query_info.query)
+                    live_plan_results.append({
+                        'line': query_info.line,
+                        'query': query_info.query[:60],
+                        'in_loop': query_info.in_loop,
+                        'plan': plan_result
+                    })
+
+                    # Add non-selective queries to issues
+                    if plan_result.success and not plan_result.is_selective:
+                        custom_issues.append({
+                            'severity': 'WARNING',
+                            'line': query_info.line,
+                            'message': f'Non-selective SOQL (cost: {plan_result.relative_cost:.1f}, op: {plan_result.leading_operation})',
+                            'fix': 'Add indexed fields to WHERE clause or reduce result set'
+                        })
+
+        except ImportError:
+            pass  # Live analysis not available
+        except Exception as e:
+            pass  # Don't fail validation on live plan errors
+
+        # ═══════════════════════════════════════════════════════════════════
         # PHASE 3: Merge scores (if CA results available)
         # ═══════════════════════════════════════════════════════════════════
         final_score = custom_score
@@ -180,6 +232,25 @@ def validate_apex_with_ca(file_path: str) -> dict:
 
         if scan_time_ms > 0:
             output_parts.append(f"    Scan time: {scan_time_ms}ms")
+
+        # Live Query Plan section
+        if live_plan_results:
+            output_parts.append("")
+            output_parts.append(f"🌐 Live Query Plan Analysis (Org: {org_name})")
+            for lp in live_plan_results[:3]:  # Show first 3
+                plan = lp['plan']
+                if plan.success:
+                    loop_warn = " ⚠️ IN LOOP" if lp['in_loop'] else ""
+                    output_parts.append(f"   L{lp['line']}: {plan.icon} Cost {plan.relative_cost:.1f} ({plan.leading_operation}){loop_warn}")
+                    if plan.notes:
+                        output_parts.append(f"      📝 {str(plan.notes[0])[:55]}")
+            if len(live_plan_results) > 3:
+                output_parts.append(f"   ... and {len(live_plan_results) - 3} more queries")
+        elif live_plan_available:
+            output_parts.append("")
+            output_parts.append("🌐 Live Query Plan: No SOQL queries found")
+        elif org_name is None and not live_plan_available:
+            pass  # Don't show if org not connected (too noisy)
 
         # Issues list
         all_issues = []
