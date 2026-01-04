@@ -520,6 +520,100 @@ Retrieve all components:
 
 ---
 
+## 🔄 Automated Test-Fix Loop
+
+> **NEW in v1.1.0** | Claude Code can now orchestrate fully automated test-fix cycles
+
+### Overview
+
+The test-fix loop enables Claude Code to:
+1. **Run tests** → `sf agent test run` with JSON output
+2. **Analyze failures** → Parse results and categorize issues
+3. **Fix agent** → Invoke `sf-ai-agentforce` skill to apply fixes
+4. **Retest** → Loop until all tests pass or max retries (3) reached
+5. **Escalate** → Skip unfixable tests and continue with others
+
+### Quick Start
+
+```bash
+# Run the test-fix loop
+./hooks/scripts/test-fix-loop.sh Test_Agentforce_v1 AgentforceTesting 3
+
+# Exit codes:
+#   0 = All tests passed
+#   1 = Fixes needed (Claude Code should invoke sf-ai-agentforce)
+#   2 = Max attempts reached, escalate to human
+#   3 = Error (org unreachable, test not found, etc.)
+```
+
+### Claude Code Integration
+
+When Claude Code runs the test-fix loop:
+
+```
+USER: Run automated test-fix loop for Coral_Cloud_Agent
+
+CLAUDE CODE:
+1. bash hooks/scripts/test-fix-loop.sh Test_Agentforce_v1 AgentforceTesting
+2. If exit code 1 (FIX_NEEDED):
+   - Parse failure details from output
+   - Invoke: Skill(skill="sf-ai-agentforce", args="Fix topic X: add keyword Y")
+   - Re-run: CURRENT_ATTEMPT=2 bash hooks/scripts/test-fix-loop.sh ...
+3. Repeat until exit code 0 (success) or 2 (max retries)
+```
+
+### Ralph Wiggum Integration (Hands-Off)
+
+For fully automated loops without user intervention:
+
+```
+/ralph-wiggum:ralph-loop
+> Run agentic test-fix loop for Test_Agentforce_v1 in AgentforceTesting until all tests pass
+```
+
+Claude Code will autonomously:
+- Execute test-fix cycles
+- Apply fixes via sf-ai-agentforce skill
+- Track attempts and escalate when needed
+- Report final status
+
+### Failure Categories & Auto-Fix Strategies
+
+| Category | Auto-Fixable | Fix Strategy |
+|----------|--------------|--------------|
+| `TOPIC_NOT_MATCHED` | ✅ Yes | Add keywords to topic classificationDescription |
+| `ACTION_NOT_INVOKED` | ✅ Yes | Improve action description, add trigger conditions |
+| `WRONG_ACTION_SELECTED` | ✅ Yes | Differentiate action descriptions |
+| `GUARDRAIL_NOT_TRIGGERED` | ✅ Yes | Add explicit guardrails to system instructions |
+| `ACTION_INVOCATION_FAILED` | ⚠️ Conditional | Delegate to sf-flow or sf-apex skill |
+| `RESPONSE_QUALITY_ISSUE` | ✅ Yes | Add response format rules to topic instructions |
+
+### Environment Variables
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `CURRENT_ATTEMPT` | Current attempt number (auto-incremented) | 1 |
+| `MAX_WAIT_MINUTES` | Timeout for test execution | 10 |
+| `SKIP_TESTS` | Comma-separated test names to skip | (none) |
+| `VERBOSE` | Enable detailed output | false |
+
+### Machine-Readable Output
+
+The script outputs structured data for Claude Code parsing:
+
+```
+---BEGIN_MACHINE_READABLE---
+FIX_NEEDED: true
+TEST_API_NAME: Test_Agentforce_v1
+TARGET_ORG: AgentforceTesting
+CURRENT_ATTEMPT: 1
+MAX_ATTEMPTS: 3
+NEXT_COMMAND: CURRENT_ATTEMPT=2 ./test-fix-loop.sh Test_Agentforce_v1 AgentforceTesting 3
+---END_MACHINE_READABLE---
+```
+
+---
+
 ## 🐛 Known Issues & CLI Bugs
 
 > **Last Updated**: 2026-01-04 | **Tested With**: sf CLI v2.118.16
