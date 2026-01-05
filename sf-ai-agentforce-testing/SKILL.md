@@ -517,6 +517,48 @@ Retrieve all components:
 | Empty responses | Agent doesn't respond | Check agent is activated |
 | Agent Testing Center unavailable | "INVALID_TYPE" error | Use `sf agent preview` as fallback |
 | Topic expectation empty | Test always passes topic check | Bug in CLI YAML→XML conversion; use interactive mode |
+| **⚠️ `--use-most-recent` broken** | **"Nonexistent flag" error on `sf agent test results`** | **Use `--job-id` explicitly - the flag is documented but NOT implemented** |
+| **Topic name mismatch** | **Expected `GeneralCRM`, got `MigrationDefaultTopic`** | **Standard Salesforce copilots route to `MigrationDefaultTopic` - verify actual topic names from first test run** |
+| **Test data missing** | **"No matching records" in outcome** | **Verify test utterances reference records that actually exist in org (e.g., "Edge Communications" not "Acme")** |
+| **Action assertion fails unexpectedly** | **Expected `[A]`, actual `[A,B]` but marked PASS** | **Action matching uses SUPERSET logic - actual can have MORE actions than expected and still pass** |
+
+---
+
+## 🔄 Two Fix Strategies
+
+When agent tests fail, there are TWO valid approaches:
+
+| Agent Type | Fix Strategy | When to Use |
+|------------|--------------|-------------|
+| **Custom Agent** (you control it) | Fix the agent via `sf-ai-agentforce` | Topic descriptions, action configurations need adjustment |
+| **Managed/Standard Agent** (Salesforce copilot) | Fix test expectations in YAML | Test expectations don't match actual agent behavior |
+
+**Decision Flow:**
+```
+Test Failed → Can you modify the agent?
+                    │
+          ┌────────┴────────┐
+          ↓                 ↓
+         YES                NO
+          ↓                 ↓
+    Fix Agent          Fix Test Spec
+    (sf-ai-agentforce)  (update YAML)
+```
+
+**Example: Fixing Test Expectations**
+```yaml
+# BEFORE (wrong expectations)
+expectedTopic: GeneralCRM
+expectedActions:
+  - IdentifyRecordByName
+  - GetRecordDetails
+
+# AFTER (matches actual behavior)
+expectedTopic: MigrationDefaultTopic
+expectedActions:
+  - IdentifyRecordByName
+  - QueryRecords
+```
 
 ---
 

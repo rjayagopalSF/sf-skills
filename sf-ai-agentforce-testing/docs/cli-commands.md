@@ -201,25 +201,40 @@ Retrieve results from a completed test run.
 sf agent test results --job-id <id> --target-org <alias> [--result-format <format>]
 ```
 
+**⚠️ CRITICAL BUG:** The `--use-most-recent` flag is documented in `--help` but **NOT IMPLEMENTED**. You will get "Nonexistent flag" error. **ALWAYS use `--job-id` explicitly.**
+
 **Flags:**
 
 | Flag | Description |
 |------|-------------|
-| `-i, --job-id` | Job ID from `test run` command |
+| `-i, --job-id` | **(REQUIRED)** Job ID from `test run` command |
 | `-o, --target-org` | Target org alias or username |
 | `-r, --result-format` | Output format: `human`, `json`, `junit`, `tap` |
 | `-d, --output-dir` | Directory to save results |
 | `--verbose` | Include generated data (actions, objects touched) |
 
+**⛔ Non-working flags (DO NOT USE):**
+- `--use-most-recent` - Documented but NOT implemented as of Jan 2026
+
 **Example:**
 
 ```bash
-# Get results from specific job
-sf agent test results --job-id 0Ah7X0000000001 --result-format json --target-org dev
+# Get results from specific job (REQUIRED - must use job-id)
+sf agent test results --job-id 4KBak0000001btZGAQ --result-format json --target-org dev
 
 # Save results to file
-sf agent test results --job-id 0Ah7X0000000001 --output-dir ./results --target-org dev
+sf agent test results --job-id 4KBak0000001btZGAQ --output-dir ./results --target-org dev
+
+# With verbose output to see action details
+sf agent test results --job-id 4KBak0000001btZGAQ --verbose --target-org dev
 ```
+
+**Getting the Job ID:**
+The `sf agent test run` command outputs the job ID when it starts:
+```
+Job ID: 4KBak0000001btZGAQ
+```
+Save this ID to retrieve results later.
 
 ---
 
@@ -505,6 +520,51 @@ cat ./debug/apex-debug.log | grep ERROR
 | "401 Unauthorized" | Connected app issue | Check OAuth setup via sf-connected-apps |
 | "Job ID not found" | Test timed out | Use `sf agent test resume` |
 | "No results" | Test still running | Wait longer or use `--wait` |
+| **"Nonexistent flag: --use-most-recent"** | CLI bug | Use `--job-id` explicitly instead |
+| **Topic assertion fails** | Expected topic doesn't match actual | Standard copilots use `MigrationDefaultTopic` - update test expectations |
+| **"No matching records"** | Test data doesn't exist | Verify utterances reference actual org data |
+| **Test exists confirmation hangs** | Interactive prompt in script | Use `echo "y" \| sf agent test create...` |
+
+---
+
+## ⚠️ Common Pitfalls (Lessons Learned)
+
+### 1. Action Matching Uses Superset Logic
+
+Action assertions use **flexible superset matching**:
+- Expected: `[IdentifyRecordByName]`
+- Actual: `[IdentifyRecordByName, SummarizeRecord]`
+- Result: ✅ **PASS** (actual contains expected)
+
+This means tests pass if the agent invokes *at least* the expected actions, even if it invokes additional ones.
+
+### 2. Topic Names Vary by Agent Type
+
+| Agent Type | Typical Topic Names |
+|------------|---------------------|
+| Standard Salesforce Copilot | `MigrationDefaultTopic` |
+| Custom Agent | Custom names you define |
+| Agentforce for Service | `GeneralCRM`, `OOTBSingleRecordSummary` |
+
+**Best Practice:** Run one test first, check actual topic names in results, then update expectations.
+
+### 3. Test Data Must Exist
+
+Tests referencing specific records will fail if:
+- The record doesn't exist (e.g., "Acme" account)
+- The record name doesn't match exactly (case-sensitive)
+
+**Best Practice:** Query org for actual data before writing tests:
+```bash
+sf data query --query "SELECT Name FROM Account LIMIT 5" --target-org dev
+```
+
+### 4. Two Fix Strategies Exist
+
+| Agent Type | Fix Strategy |
+|------------|--------------|
+| Custom Agent (you control) | Fix agent via sf-ai-agentforce |
+| Managed/Standard Agent | Fix test expectations in YAML |
 
 ---
 
