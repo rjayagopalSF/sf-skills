@@ -13,9 +13,10 @@ Comprehensive code examples for common Lightning Web Component patterns.
 5. [Record Picker Pattern](#record-picker-pattern)
 6. [Workspace API Pattern](#workspace-api-pattern)
 7. [Parent-Child Communication](#parent-child-communication)
-8. [Navigation Patterns](#navigation-patterns)
-9. [TypeScript Patterns](#typescript-patterns)
-10. [Apex Controller Patterns](#apex-controller-patterns)
+8. [Sibling Communication (via Parent)](#sibling-communication-via-parent)
+9. [Navigation Patterns](#navigation-patterns)
+10. [TypeScript Patterns](#typescript-patterns)
+11. [Apex Controller Patterns](#apex-controller-patterns)
 
 ---
 
@@ -807,6 +808,187 @@ export default class AccountList extends LightningElement {
     }
 }
 ```
+
+---
+
+## Sibling Communication (via Parent)
+
+When two child components need to communicate but share the same parent, use the **parent as middleware**. This is the recommended pattern for master-detail UIs.
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                    SIBLING COMMUNICATION FLOW                       │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                     │
+│                         ┌──────────┐                                │
+│                         │  Parent  │  ← Manages state               │
+│                         └────┬─────┘                                │
+│                    ┌─────────┴─────────┐                            │
+│                    │                   │                            │
+│              CustomEvent          @api property                     │
+│                (up)                 (down)                          │
+│                    │                   │                            │
+│              ┌─────┴─────┐       ┌─────┴─────┐                      │
+│              │  Child A  │       │  Child B  │                      │
+│              │  (List)   │       │  (Detail) │                      │
+│              └───────────┘       └───────────┘                      │
+│                                                                     │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+**The flow**:
+1. **Child A** dispatches a custom event (e.g., user selects an account)
+2. **Parent** catches the event and updates its state
+3. **Parent** passes data to **Child B** via `@api` property
+
+### Complete Example: Account List → Account Detail
+
+```javascript
+// accountContainer.js - Parent orchestrates communication between siblings
+import { LightningElement } from 'lwc';
+
+export default class AccountContainer extends LightningElement {
+    // State managed at parent level
+    selectedAccountId;
+    selectedAccountName;
+
+    // Child A (accountList) fires this event
+    handleAccountSelect(event) {
+        this.selectedAccountId = event.detail.accountId;
+        this.selectedAccountName = event.detail.accountName;
+    }
+
+    // Clear selection (triggered by Child B)
+    handleClearSelection() {
+        this.selectedAccountId = null;
+        this.selectedAccountName = null;
+    }
+
+    get hasSelection() {
+        return !!this.selectedAccountId;
+    }
+}
+```
+
+```html
+<!-- accountContainer.html -->
+<template>
+    <div class="slds-grid slds-gutters">
+        <!-- Child A: Account List -->
+        <div class="slds-col slds-size_1-of-2">
+            <c-account-list
+                onaccountselect={handleAccountSelect}
+                selected-id={selectedAccountId}>
+            </c-account-list>
+        </div>
+
+        <!-- Child B: Account Detail (receives data via @api) -->
+        <div class="slds-col slds-size_1-of-2">
+            <template lwc:if={hasSelection}>
+                <c-account-detail
+                    account-id={selectedAccountId}
+                    account-name={selectedAccountName}
+                    onclearselection={handleClearSelection}>
+                </c-account-detail>
+            </template>
+            <template lwc:else>
+                <div class="slds-box slds-theme_shade">
+                    Select an account to view details
+                </div>
+            </template>
+        </div>
+    </div>
+</template>
+```
+
+```javascript
+// accountList.js - Child A: Dispatches events UP to parent
+import { LightningElement, api, wire } from 'lwc';
+import getAccounts from '@salesforce/apex/AccountController.getAccounts';
+
+export default class AccountList extends LightningElement {
+    @api selectedId; // Highlight selected row (from parent)
+    accounts;
+    error;
+
+    @wire(getAccounts)
+    wiredAccounts({ data, error }) {
+        if (data) {
+            this.accounts = data;
+            this.error = undefined;
+        } else if (error) {
+            this.error = error;
+            this.accounts = undefined;
+        }
+    }
+
+    handleRowClick(event) {
+        const accountId = event.currentTarget.dataset.id;
+        const accountName = event.currentTarget.dataset.name;
+
+        // Dispatch event to parent (not bubbles - parent listens directly)
+        this.dispatchEvent(new CustomEvent('accountselect', {
+            detail: { accountId, accountName }
+        }));
+    }
+
+    // Computed: Check if row should be highlighted
+    getRowClass(accountId) {
+        return accountId === this.selectedId
+            ? 'slds-item slds-is-selected'
+            : 'slds-item';
+    }
+}
+```
+
+```javascript
+// accountDetail.js - Child B: Receives data via @api from parent
+import { LightningElement, api, wire } from 'lwc';
+import { getRecord, getFieldValue } from 'lightning/uiRecordApi';
+import INDUSTRY_FIELD from '@salesforce/schema/Account.Industry';
+import REVENUE_FIELD from '@salesforce/schema/Account.AnnualRevenue';
+
+const FIELDS = [INDUSTRY_FIELD, REVENUE_FIELD];
+
+export default class AccountDetail extends LightningElement {
+    @api accountId;      // Received from parent
+    @api accountName;    // Received from parent
+
+    @wire(getRecord, { recordId: '$accountId', fields: FIELDS })
+    account;
+
+    get industry() {
+        return getFieldValue(this.account.data, INDUSTRY_FIELD);
+    }
+
+    get revenue() {
+        return getFieldValue(this.account.data, REVENUE_FIELD);
+    }
+
+    get isLoading() {
+        return !this.account.data && !this.account.error;
+    }
+
+    handleClose() {
+        // Dispatch event back to parent to clear selection
+        this.dispatchEvent(new CustomEvent('clearselection'));
+    }
+}
+```
+
+### When to Use Sibling Pattern vs LMS
+
+| Scenario | Sibling Pattern | LMS |
+|----------|-----------------|-----|
+| Components share same parent | ✅ Recommended | ❌ Overkill |
+| State is simple (1-2 values) | ✅ | ❌ |
+| Need bidirectional updates | ✅ | ✅ |
+| Components in different DOM trees | ❌ | ✅ Required |
+| Cross-framework (LWC ↔ Aura) | ❌ | ✅ Required |
+| Many consumers need same data | ❌ Consider LMS | ✅ |
+| Component hierarchy is deep (4+ levels) | ❌ Consider LMS | ✅ |
+
+**Rule of thumb**: If components share a parent and data flow is simple, use sibling pattern. If components are "far apart" in the DOM or you need pub/sub semantics, use LMS.
 
 ---
 

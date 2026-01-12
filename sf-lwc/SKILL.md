@@ -87,6 +87,31 @@ The **PICKLES Framework** provides a structured approach to designing robust Lig
 | Lightning Message Service | Any → Any | Cross-DOM communication |
 | Pub/Sub | Sibling → Sibling | Same page, no hierarchy |
 
+### Communication Pattern Quick Reference
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│              LWC COMMUNICATION - MADE SIMPLE                        │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                     │
+│  Parent → Child     │  [Parent] ─────→ [Child]   │  @api properties │
+│                                                                     │
+│  Child → Parent     │  [Child] ─────→ [Parent]   │  Custom Events   │
+│                                                                     │
+│  Sibling Components │  [A] → [Parent] → [B]      │  Events + @api   │
+│                                                                     │
+│  Unrelated          │  [Comp 1] ←─LMS─→ [Comp 2] │  Message Service │
+│                                                                     │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+**Decision Tree**:
+- Same parent? → Use parent as middleware (events up, `@api` down)
+- Different DOM trees? → Use Lightning Message Service
+- LWC ↔ Aura/VF? → Use Lightning Message Service
+
+**For complete sibling communication code example, see [resources/component-patterns.md](resources/component-patterns.md#sibling-communication-via-parent)**
+
 ### Lifecycle Hook Guidance
 
 | Hook | When to Use | Avoid |
