@@ -22,14 +22,14 @@
         "./sf-deploy",
         "./skill-builder",
         "./sf-ai-agentforce",
-        "./sf-diagram",
+        "./sf-diagram-mermaid",
         "./sf-integration",
         "./sf-connected-apps",
         "./sf-lwc",
         "./sf-debug",
         "./sf-soql",
         "./sf-testing",
-        "./sf-imagen",
+        "./sf-diagram-nanobananapro",
         "./sf-ai-agentforce-testing"
       ]
     },
@@ -125,10 +125,10 @@
       "keywords": ["agentforce", "agent", "topic", "action"]
     },
     {
-      "name": "sf-diagram",
+      "name": "sf-diagram-mermaid",
       "description": "Mermaid diagrams for OAuth flows, ERDs, integrations, and Agentforce architecture with 80-point scoring",
-      "source": "./sf-diagram",
-      "version": "1.0.0",
+      "source": "./sf-diagram-mermaid",
+      "version": "1.1.0",
       "author": {
         "name": "Jag Valaiyapathy",
         "url": "https://github.com/Jaganpro"
@@ -216,10 +216,10 @@
       "keywords": ["testing", "coverage", "apex-test", "assertions"]
     },
     {
-      "name": "sf-imagen",
+      "name": "sf-diagram-nanobananapro",
       "description": "AI-powered visual content generation for Salesforce using Nano Banana Pro (Gemini 3 Pro Image)",
-      "source": "./sf-imagen",
-      "version": "1.0.0",
+      "source": "./sf-diagram-nanobananapro",
+      "version": "1.1.0",
       "author": {
         "name": "Jag Valaiyapathy",
         "url": "https://github.com/Jaganpro"

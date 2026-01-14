@@ -268,8 +268,8 @@ python tools/installer.py --cli agentforce-vibes --all
 | 🤖 | **[sf-ai-agentforce](sf-ai-agentforce/)** | Agent Script, Topics, Actions (API v64+) | 🤖 AI & Automation | 150 | 🔬 Alpha |
 | 🧪 | **[sf-ai-agentforce-testing](sf-ai-agentforce-testing/)** | Agent test specs, agentic fix loops | 🤖 AI & Automation | 100 | 🔬 Alpha |
 | 🚀 | **[sf-deploy](sf-deploy/)** | CI/CD automation (sf CLI v2) | 🚀 DevOps | — | 🔬 Alpha |
-| 📊 | **[sf-diagram](sf-diagram/)** | Mermaid diagrams & ERD | 🛠️ Tooling | — | 🔬 Alpha |
-| 📸 | **[sf-imagen](sf-imagen/)** | Visual ERD, LWC mockups, Gemini sub-agent | 🛠️ Tooling | — | 🔬 Alpha |
+| 📊 | **[sf-diagram-mermaid](sf-diagram-mermaid/)** | Mermaid diagrams & ERD | 🛠️ Tooling | — | 🔬 Alpha |
+| 📸 | **[sf-diagram-nanobananapro](sf-diagram-nanobananapro/)** | Visual ERD, LWC mockups, Gemini sub-agent | 🛠️ Tooling | — | 🔬 Alpha |
 | 🛠️ | **[skill-builder](skill-builder/)** | Skill creation wizard | 🛠️ Tooling | — | ✅ Stable |
 
 ## 🚀 Installation
@@ -339,7 +339,7 @@ flowchart TB
     subgraph integration["🔌 INTEGRATION & SECURITY"]
         connectedapps["🔐 sf-connected-apps"]
         sfintegration["🔗 sf-integration"]
-        diagram["📊 sf-diagram"]
+        diagram["📊 sf-diagram-mermaid"]
     end
 
     subgraph development["💻 DEVELOPMENT"]
@@ -365,7 +365,7 @@ flowchart TB
 
     subgraph tooling["🔧 TOOLING"]
         skillbuilder["🛠️ skill-builder"]
-        imagen["📸 sf-imagen"]
+        imagen["📸 sf-diagram-nanobananapro"]
     end
 
     %% AI & Agent relationships
@@ -488,7 +488,7 @@ You can invoke the suggested skill or let Claude help directly
 **Supported Triggers (all 16 skills):**
 - **High Priority**: sf-apex, sf-flow, sf-lwc, sf-ai-agentforce
 - **Medium Priority**: sf-metadata, sf-deploy, sf-testing, sf-soql, sf-data, sf-integration
-- **Low Priority**: sf-connected-apps, sf-debug, sf-diagram, sf-imagen, sf-ai-agentforce-testing, skill-builder
+- **Low Priority**: sf-connected-apps, sf-debug, sf-diagram-mermaid, sf-diagram-nanobananapro, sf-ai-agentforce-testing, skill-builder
 
 **Configuration:** Auto-activation is powered by `shared/hooks/skill-rules.json` and `shared/hooks/skill-activation-prompt.py`.
 
@@ -512,7 +512,7 @@ Each skill includes validation hooks that run automatically on **Write** and **E
 | 🧪 | sf-ai-agentforce-testing | Test spec YAML | 100-pt scoring + fix loops |
 | 🔐 | sf-connected-apps | `*.connectedApp-meta.xml` | OAuth security |
 | 🔗 | sf-integration | `*.namedCredential-meta.xml` | Callout patterns |
-| 📸 | sf-imagen | Generated images | Prerequisites check |
+| 📸 | sf-diagram-nanobananapro | Generated images | Prerequisites check |
 | 🛠️ | skill-builder | `SKILL.md` | YAML frontmatter |
 
 #### 🔬 Code Analyzer V5 Integration
@@ -787,12 +787,12 @@ sf-industry-{name}        # Industries (healthcare, finserv)
 |--|-------|-------------|--------|
 | 🔐 | `sf-connected-apps` | Connected Apps, ECAs, OAuth configuration | ✅ Live |
 | 🔗 | `sf-integration` | Named Credentials, External Services, REST/SOAP, Platform Events, CDC | ✅ Live |
-| 📊 | `sf-diagram` | Mermaid diagrams for OAuth, ERD, integrations, architecture | ✅ Live |
+| 📊 | `sf-diagram-mermaid` | Mermaid diagrams for OAuth, ERD, integrations, architecture | ✅ Live |
 | ⚡ | `sf-lwc` | Lightning Web Components, Jest, LMS | ✅ Live |
 | 🔍 | `sf-soql` | Natural language to SOQL, optimization | ✅ Live |
 | 🧪 | `sf-testing` | Test execution, coverage, bulk testing | ✅ Live |
 | 🐛 | `sf-debug` | Debug log analysis, governor fixes | ✅ Live |
-| 📸 | `sf-imagen` | Visual ERD, LWC mockups, Gemini sub-agent | ✅ Live |
+| 📸 | `sf-diagram-nanobananapro` | Visual ERD, LWC mockups, Gemini sub-agent | ✅ Live |
 | 🔒 | `sf-security` | Sharing rules, org-wide defaults, encryption | 📋 Planned |
 | 📦 | `sf-migration` | Org-to-org, metadata comparison | 📋 Planned |
 

@@ -147,7 +147,7 @@
         "commonly_with": [
           { "skill": "sf-flow", "trigger": "object-meta\\.xml", "message": "Create record-triggered Flow for this object", "confidence": 2 },
           { "skill": "sf-apex", "trigger": "object-meta\\.xml", "message": "Create Apex trigger or service for this object", "confidence": 2 },
-          { "skill": "sf-diagram", "trigger": "object-meta\\.xml", "message": "Generate ERD diagram for data model", "confidence": 1 }
+          { "skill": "sf-diagram-mermaid", "trigger": "object-meta\\.xml", "message": "Generate ERD diagram for data model", "confidence": 1 }
         ]
       }
     },
@@ -294,7 +294,7 @@
       "filePatterns": ["\\.connectedApp-meta\\.xml$", "\\.eca-meta\\.xml$"],
       "contentTriggers": {
         "oauthConfig": { "suggests": "sf-integration", "message": "Create Named Credential using this Connected App" },
-        "JWT": { "suggests": "sf-diagram", "message": "Generate OAuth flow diagram" }
+        "JWT": { "suggests": "sf-diagram-mermaid", "message": "Generate OAuth flow diagram" }
       },
       "priority": "low",
       "description": "OAuth and authentication configuration",
@@ -306,7 +306,7 @@
         ],
         "commonly_with": [
           { "skill": "sf-integration", "trigger": "always", "message": "Create Named Credential using this Connected App", "confidence": 2 },
-          { "skill": "sf-diagram", "trigger": "OAuth", "message": "Generate OAuth flow diagram", "confidence": 1 }
+          { "skill": "sf-diagram-mermaid", "trigger": "OAuth", "message": "Generate OAuth flow diagram", "confidence": 1 }
         ]
       }
     },
@@ -337,7 +337,7 @@
       }
     },
 
-    "sf-diagram": {
+    "sf-diagram-mermaid": {
       "keywords": ["diagram", "erd", "mermaid", "architecture", "visualization", "data model", "entity relationship", "sequence diagram", "flowchart", "class diagram", "object diagram", "schema"],
       "intentPatterns": [
         "create.*diagram", "visualize.*schema", "draw.*architecture",
@@ -359,12 +359,12 @@
         "commonly_with": [
           { "skill": "sf-metadata", "trigger": "erd|ERD|data model", "message": "Query org metadata for accurate ERD", "confidence": 2 },
           { "skill": "sf-integration", "trigger": "sequence|integration", "message": "Document integration endpoints", "confidence": 1 },
-          { "skill": "sf-imagen", "trigger": "visual|image", "message": "Generate visual image from diagram", "confidence": 1 }
+          { "skill": "sf-diagram-nanobananapro", "trigger": "visual|image", "message": "Generate visual image from diagram", "confidence": 1 }
         ]
       }
     },
 
-    "sf-imagen": {
+    "sf-diagram-nanobananapro": {
       "keywords": ["mockup", "visual", "image", "erd image", "wireframe", "ui design", "visual erd", "png", "svg", "screenshot", "preview"],
       "intentPatterns": [
         "create.*mockup", "generate.*visual", "design.*ui",
@@ -377,11 +377,11 @@
       "description": "Visual mockups and image generation",
       "orchestration": {
         "prerequisites": [
-          { "skill": "sf-diagram", "condition": "mermaid_source", "message": "Create Mermaid diagram first for conversion to image", "confidence": 2 }
+          { "skill": "sf-diagram-mermaid", "condition": "mermaid_source", "message": "Create Mermaid diagram first for conversion to image", "confidence": 2 }
         ],
         "next_steps": [],
         "commonly_with": [
-          { "skill": "sf-diagram", "trigger": "mermaid|erd", "message": "Generate Mermaid source for this visualization", "confidence": 2 },
+          { "skill": "sf-diagram-mermaid", "trigger": "mermaid|erd", "message": "Generate Mermaid source for this visualization", "confidence": 2 },
           { "skill": "sf-lwc", "trigger": "mockup|wireframe", "message": "Implement the mockup as an LWC", "confidence": 1 }
         ]
       }

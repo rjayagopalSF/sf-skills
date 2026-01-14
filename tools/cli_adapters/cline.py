@@ -46,8 +46,9 @@ class ClineAdapter(CLIAdapter):
         'sf-integration': '10',
         'sf-ai-agentforce': '11',
         'sf-deploy': '12',
-        'sf-diagram': '13',
+        'sf-diagram-mermaid': '13',
         'skill-builder': '14',
+        'sf-diagram-nanobananapro': '15',
     }
 
     @property
@@ -174,8 +175,9 @@ with Claude Code or running validation scripts manually.
             'sf-integration': 'Integration Patterns',
             'sf-ai-agentforce': 'Agentforce AI Agents',
             'sf-deploy': 'Deployment Automation',
-            'sf-diagram': 'Mermaid Diagrams',
+            'sf-diagram-mermaid': 'Mermaid Diagrams',
             'skill-builder': 'Skill Builder',
+            'sf-diagram-nanobananapro': 'Nano Banana Pro Diagrams',
         }
         return name_mapping.get(skill_name, skill_name.replace('-', ' ').title())
 
@@ -194,8 +196,9 @@ with Claude Code or running validation scripts manually.
             'sf-integration': '- `**/*.namedCredential-meta.xml` - Named Credentials\n- `**/*.externalService-meta.xml` - External Services',
             'sf-ai-agentforce': '- `**/*.agent-meta.xml` - Agent definitions\n- `**/*.genAiFunction-meta.xml` - GenAI functions',
             'sf-deploy': '- `**/sfdx-project.json` - Project config\n- `**/package.xml` - Package manifests',
-            'sf-diagram': '- `**/*.md` - Markdown with diagrams',
+            'sf-diagram-mermaid': '- `**/*.md` - Markdown with diagrams',
             'skill-builder': '- `**/SKILL.md` - Skill definitions',
+            'sf-diagram-nanobananapro': '- `**/*.png` - Generated images\n- `**/*.jpg` - Generated images',
         }
         return pattern_mapping.get(skill_name, '- `**/*` - All files')
 
