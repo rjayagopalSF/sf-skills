@@ -6,7 +6,7 @@ description: >
   Events, Change Data Capture, or connecting Salesforce to external systems.
 license: MIT
 metadata:
-  version: "1.0.0"
+  version: "1.1.0"
   author: "Jag Valaiyapathy"
   scoring: "120 points across 6 categories"
 ---
@@ -432,6 +432,52 @@ sf org list metadata --metadata-type CustomObject --target-org {{alias}} | grep 
 # Deploy Platform Event
 sf project deploy start --metadata CustomObject:{{EventName}}__e --target-org {{alias}}
 ```
+
+---
+
+## 🔧 Helper Scripts
+
+sf-integration includes automation scripts to configure credentials without manual UI steps.
+
+### Available Scripts
+
+| Script | Purpose | Usage |
+|--------|---------|-------|
+| `configure-named-credential.sh` | Set API keys via ConnectApi (Enhanced NC) | `./scripts/configure-named-credential.sh <org-alias>` |
+| `set-api-credential.sh` | Store keys in Custom Settings (legacy) | `./scripts/set-api-credential.sh <name> - <org-alias>` |
+
+### Auto-Run Behavior
+
+When you create credential metadata files, Claude automatically suggests running the appropriate script:
+
+| File Pattern | Suggested Action |
+|--------------|------------------|
+| `*.namedCredential-meta.xml` | Run `configure-named-credential.sh` |
+| `*.externalCredential-meta.xml` | Run `configure-named-credential.sh` |
+| `*.cspTrustedSite-meta.xml` | Deploy endpoint security |
+
+### Example Workflow
+
+```bash
+# 1. Claude generates credential metadata files
+# 2. Hook detects and suggests next steps
+# 3. Deploy metadata first
+sf project deploy start --metadata ExternalCredential:WeatherAPI \
+  --metadata NamedCredential:WeatherAPI \
+  --target-org MyOrg
+
+# 4. Run automation script
+./scripts/configure-named-credential.sh MyOrg
+# Enter API key when prompted (secure, hidden input)
+```
+
+### Prerequisites
+
+- **Salesforce CLI v2+**: `sf` command available
+- **Authenticated org**: `sf org login web -a <alias>`
+- **Deployed metadata**: External Credential and Named Credential deployed
+
+📚 **Documentation**: See [docs/named-credentials-automation.md](docs/named-credentials-automation.md) for complete guide.
 
 ---
 
