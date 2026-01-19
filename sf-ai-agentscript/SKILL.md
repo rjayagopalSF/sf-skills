@@ -8,10 +8,10 @@ description: >
 license: MIT
 compatibility: "Requires Agentforce license, API v65.0+, Einstein Agent User"
 metadata:
-  version: "1.0.3"
+  version: "1.0.4"
   author: "Jag Valaiyapathy"
   scoring: "100 points across 6 categories"
-  validated: "0-shot generation tested successfully (Pet Adoption Advisor, TechCorp IT Agent)"
+  validated: "0-shot generation tested (Pet_Adoption_Advisor, TechCorp_IT_Agent, Quiz_Master, Expense_Calculator, Order_Processor)"
 ---
 
 # SF-AI-AgentScript Skill
@@ -42,7 +42,9 @@ Agent Script transforms agent development from prompt-based suggestions to **cod
 
 | Constraint | ❌ WRONG | ✅ CORRECT |
 |------------|----------|-----------|
-| **No nested if statements** | `if x:` then `if y:` (nested) | `if x and y:` (compound) |
+| **No nested if statements** | `if x:` then `if y:` (nested) | `if x and y:` (compound) OR flatten to sequential ifs |
+| **No top-level `actions:` block** | `actions:` at root level | Actions only inside `topic.reasoning.actions:` |
+| **No `inputs:`/`outputs:` in actions** | `inputs:` block inside action | Use `with` for inputs, `set` for outputs |
 | **One `available when` per action** | Two `available when` clauses | `available when A and B` |
 | **Avoid reserved action names** | `escalate: @utils.escalate` | `escalate_now: @utils.escalate` |
 | **`...` is slot-filling only** | `my_var: mutable string = ...` | `my_var: mutable string = ""` |
@@ -51,17 +53,29 @@ Agent Script transforms agent development from prompt-based suggestions to **cod
 | **Post-action only on @actions** | `@utils.X` with `set`/`run` | Only `@actions.X` supports post-action |
 | **agent_name must match folder** | Folder: `MyAgent`, config: `my_agent` | Both must be identical (case-sensitive) |
 
-#### No Nested `if` - Use Compound Conditions
+#### No Nested `if` - Two Valid Approaches
 ```yaml
 # ❌ WRONG - Nested if (causes SyntaxError)
 if @variables.software_cost > 0:
    if @variables.software_cost <= 500:
       | Auto-approve this software request.
 
-# ✅ CORRECT - Compound condition
+# ✅ CORRECT Approach 1 - Compound condition (when logic allows)
 if @variables.software_cost > 0 and @variables.software_cost <= 500:
    | Auto-approve this software request.
+
+# ✅ CORRECT Approach 2 - Flatten to sequential ifs (for separate messages)
+if @variables.order_verified == False or @variables.payment_confirmed == False:
+   | ❌ **PROCESSING BLOCKED**
+   | Missing requirements:
+
+if @variables.order_verified == False:
+   | - Order verification pending
+
+if @variables.payment_confirmed == False:
+   | - Payment confirmation pending
 ```
+> **When to use each**: Use compound conditions when logic permits (single condition block). Use flattening when you need separate conditional outputs that can't be combined.
 
 #### `...` is Slot-Filling Syntax (LLM Extracts from Conversation)
 ```yaml
@@ -519,7 +533,10 @@ topic refund:
 | `Default agent user X could not be found` | User doesn't exist in target org | Query the **specific target org** (user formats vary: some use `user@orgid.ext`) |
 | `No .agent file found in directory` | `agent_name` doesn't match folder | Make `agent_name` identical to folder name (case-sensitive) |
 | `SyntaxError: cannot mix spaces and tabs` | Mixed indentation | Use consistent spacing throughout |
-| `SyntaxError: Unexpected 'if'` | Nested if statements | Use compound condition: `if A and B:` |
+| `SyntaxError: Unexpected 'if'` | Nested if statements | Use compound condition: `if A and B:` or flatten to sequential ifs |
+| `SyntaxError: Unexpected 'actions'` | Top-level actions block | Move actions inside `topic.reasoning.actions:` |
+| `SyntaxError: Unexpected 'inputs'` | `inputs:` block in action | Use `with param=value` syntax instead |
+| `SyntaxError: Unexpected 'outputs'` | `outputs:` block in action | Use `set @variables.x = @outputs.y` instead |
 | `SyntaxError: Unexpected 'set'` | `set` after `@utils.setVariables` | Use Helper Topic Pattern (set in `instructions: ->`) |
 | `Duplicate 'available when' clause` | Multiple guards on action | Combine: `available when A and B` |
 | `Unexpected 'escalate'` | Reserved action name | Rename to `escalate_now` or `escalate_to_human` |
@@ -548,11 +565,15 @@ Einstein Agent User formats vary between orgs:
 - **Production/Partner orgs**: Often use `username@orgid.ext` format (e.g., `resort_manager@00dak00000gdgwu480119933.ext`)
 - **Dev orgs**: May use `username.suffix@orgfarm.salesforce.com` format
 
+**MANDATORY: Ask user to confirm which Einstein Agent User to use when creating a new agent.**
+
 **Always query the specific target org:**
 ```bash
 # Query target org specifically
 sf data query -q "SELECT Username FROM User WHERE Profile.Name = 'Einstein Agent User' AND IsActive = true" -o YOUR_TARGET_ORG
 ```
+
+Present the results to the user and ask them to select which user to use for `default_agent_user`.
 
 > ⚠️ A user existing in one org does NOT mean it exists in another. Always verify in the deployment target.
 
@@ -678,6 +699,8 @@ start_agent entry:
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 1.0.4 | 2026-01-19 | **Progressive testing validation** (Quiz_Master, Expense_Calculator, Order_Processor): Added constraints for no top-level `actions:` block, no `inputs:`/`outputs:` in reasoning.actions, expanded nested-if guidance with flattening approach, added new SyntaxError entries to common issues |
+| 1.0.3 | 2026-01-19 | Added Einstein Agent User interview requirement - mandatory user confirmation when creating new agents |
 | 1.0.2 | 2026-01-19 | **Major corrections from GitHub reference**: Fixed block order (config→system), added Helper Topic Pattern, transition vs delegation, expression operators (+/- only), naming rules (80 char max), slot-filling `...` syntax, post-action directives (@actions.* only) |
 | 1.0.1 | 2026-01-19 | Added syntax constraints from 0-shot testing: no nested if, one available when per action, reserved action names |
 | 1.0.0 | 2026-01 | Initial release with 8-module coverage |
