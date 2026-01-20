@@ -1,5 +1,12 @@
 {
   "hooks": {
+    "SessionStart": [
+      {
+        "type": "command",
+        "command": "~/.claude/plugins/marketplaces/sf-skills/shared/hooks/check-env-weekly.sh",
+        "timeout": 5000
+      }
+    ],
     "PostToolUse": [
       {
         "matcher": "Write",
