@@ -265,7 +265,7 @@ python tools/installer.py --cli agentforce-vibes --all
 | 💾 | **[sf-data](sf-data/)** | SOQL & test data factories | 📦 Foundation | — | 🔬 Alpha |
 | 🔐 | **[sf-connected-apps](sf-connected-apps/)** | OAuth apps & ECAs | 🔌 Integration | 120 | 🔬 Alpha |
 | 🔗 | **[sf-integration](sf-integration/)** | Callouts, Events, CDC | 🔌 Integration | 120 | 🔬 Alpha |
-| 🤖 | **[sf-ai-agentforce](sf-ai-agentforce/)** | Agent Script, Topics, Actions (API v64+) | 🤖 AI & Automation | 150 | 🔬 Alpha |
+| 🤖 | **[sf-ai-agentforce](sf-ai-agentforce/)** | Agent Script, Topics, Actions, TDD validation (API v65+) | 🤖 AI & Automation | 150 | 🔬 Alpha |
 | 🧪 | **[sf-ai-agentforce-testing](sf-ai-agentforce-testing/)** | Agent test specs, agentic fix loops | 🤖 AI & Automation | 100 | 🔬 Alpha |
 | 🚀 | **[sf-deploy](sf-deploy/)** | CI/CD automation (sf CLI v2) | 🚀 DevOps | — | 🔬 Alpha |
 | 📊 | **[sf-diagram-mermaid](sf-diagram-mermaid/)** | Mermaid diagrams & ERD | 🛠️ Tooling | — | 🔬 Alpha |
@@ -584,7 +584,21 @@ Skills leverage official Salesforce LSP servers for real-time syntax validation 
 3. If errors found → Claude receives diagnostics and auto-fixes
 4. Repeat up to 3 attempts
 
-**Prerequisites:** VS Code with Salesforce extensions installed (LSP servers are bundled with the extensions).
+**Prerequisites:** See LSP table in Prerequisites section. LWC uses standalone npm package; Apex and Agent Script require VS Code extensions.
+
+**Weekly Environment Health Check:**
+
+The LSP engine includes automated environment monitoring via SessionStart hook:
+- Checks VS Code extension versions against Marketplace
+- Validates Java (11+) and Node.js (18+) versions
+- Checks Salesforce CLI (`@salesforce/cli`) for updates
+- Caches results for 7 days to avoid API spam
+- Silent when current, warns only when updates available
+
+```bash
+# Manual check
+./shared/lsp-engine/check_lsp_versions.sh --force
+```
 
 **Sample Output:**
 ```
@@ -624,7 +638,7 @@ Hooks provide **advisory feedback** — they inform but don't block operations.
 |--------|-------------|-------|
 | Most skills | **62.0** (Winter '25) | sf-apex, sf-flow, sf-lwc, sf-metadata |
 | sf-connected-apps, sf-integration | **61.0** | External Client Apps |
-| sf-ai-agentforce | **65.0** (Winter '26) | Full agent deployment |
+| sf-ai-agentforce | **65.0** (Winter '26) | Full agent deployment, GenAiPlannerBundle |
 
 **Optional** (enables additional features):
 
@@ -638,12 +652,18 @@ Hooks provide **advisory feedback** — they inform but don't block operations.
 - **@salesforce-ux/slds-linter** — SLDS validation (`npm install -g @salesforce-ux/slds-linter`)
 
 *LSP real-time validation (auto-fix loops):*
-- **VS Code with Salesforce Extensions** — LSP servers are bundled with VS Code extensions
-  - Apex: Install "Salesforce Extension Pack"
-  - LWC: Install "Salesforce Extension Pack" (includes LWC Language Server)
-  - Agent Script: Install "Salesforce Agent Script" extension
+- **LWC Language Server** — `npm install -g @salesforce/lwc-language-server` (standalone, no VS Code needed)
+- **VS Code with Salesforce Extensions** — Required for Apex and Agent Script only (no npm packages available)
+  - Apex: Install "Salesforce Extension Pack" (Java JAR bundled in extension)
+  - Agent Script: Install "Salesforce Agent Script" extension (server.js bundled in extension)
 - **Java 11+** — Required for Apex LSP (same as Code Analyzer)
 - **Node.js 18+** — Required for Agent Script and LWC LSP
+
+| LSP | Standalone npm? | VS Code Required? |
+|-----|-----------------|-------------------|
+| LWC | ✅ `@salesforce/lwc-language-server` | ❌ No |
+| Apex | ❌ No (Java JAR) | ✅ Yes |
+| Agent Script | ❌ No | ✅ Yes |
 
 *Apex Development:*
 - **Trigger Actions Framework (TAF)** — Optional package for sf-apex trigger patterns
@@ -844,4 +864,4 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
 
 ## License
 
-MIT License - Copyright (c) 2024-2025 Jag Valaiyapathy
+MIT License - Copyright (c) 2024-2026 Jag Valaiyapathy
